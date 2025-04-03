@@ -1,35 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { CssBaseline } from '@mui/material'
+import { flatten } from 'flat'
+import { IntlProvider } from 'react-intl'
+import 'leaflet/dist/leaflet.css'
+import { RouterProvider } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
+
+import BackdropLoading from './components/ui/feedback/loading/backdrop'
+import { useAlarmColors } from './hooks/alarm-colors'
+import { useI18n } from './hooks/i18n'
+import { useLoading } from './hooks/loading'
+import { useLocale } from './hooks/locale'
+import { router } from './router'
+import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+	const { locale } = useLocale()
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+	useAlarmColors()
+
+	const messages = useI18n()
+
+	const { isLoading } = useLoading()
+
+	return (
+		<IntlProvider locale={locale} messages={flatten(messages[locale])}>
+			{isLoading && <BackdropLoading />}
+
+			<ToastContainer autoClose={5000} position='bottom-left' />
+
+			<CssBaseline />
+
+			<RouterProvider router={router} />
+		</IntlProvider>
+	)
 }
 
 export default App

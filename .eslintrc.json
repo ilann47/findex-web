@@ -1,0 +1,103 @@
+{
+	"env": {
+		"browser": true,
+		"es2021": true
+	},
+	"extends": [
+		"eslint:recommended",
+		"prettier",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:react/recommended",
+		"plugin:react-hooks/recommended",
+		"plugin:sonarjs/recommended",
+		"plugin:unicorn/recommended",
+		"plugin:prettier/recommended"
+	],
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"ecmaFeatures": {
+			"jsx": true
+		},
+		"ecmaVersion": "latest",
+		"sourceType": "module"
+	},
+	"settings": {
+		"react": {
+			"version": "detect"
+		}
+	},
+	"plugins": [
+		"@typescript-eslint",
+		"react",
+		"react-hooks",
+		"sonarjs",
+		"import",
+		"unicorn",
+		"prettier",
+		"unused-imports"
+	],
+	"rules": {
+		"indent": ["error", "tab"],
+		"linebreak-style": ["error", "unix"],
+		"quotes": ["error", "single"],
+		"semi": ["error", "never"],
+		"react-hooks/rules-of-hooks": "error",
+		"react-hooks/exhaustive-deps": "off",
+		"react/jsx-uses-react": 0,
+		"react/react-in-jsx-scope": 0,
+		"react/jsx-uses-vars": "error",
+		"sonarjs/no-collapsible-if": "error",
+		"sonarjs/no-collection-size-mischeck": "error",
+		"sonarjs/no-duplicated-branches": "error",
+		"sonarjs/no-gratuitous-expressions": "error",
+		"sonarjs/no-inverted-boolean-check": "error",
+		"sonarjs/no-nested-switch": "error",
+		"sonarjs/no-redundant-boolean": "error",
+		"sonarjs/no-redundant-jump": "error",
+		"sonarjs/no-unused-collection": "error",
+		"sonarjs/no-useless-catch": "error",
+		"sonarjs/prefer-immediate-return": "error",
+		"sonarjs/prefer-object-literal": "error",
+		"sonarjs/prefer-single-boolean-return": "error",
+		"prettier/prettier": "error",
+		"import/order": [
+			"error",
+			{
+				"groups": ["builtin", "external", "internal"],
+				"pathGroups": [
+					{
+						"pattern": "react",
+						"group": "external",
+						"position": "before"
+					}
+				],
+				"pathGroupsExcludedImportTypes": ["react"],
+				"newlines-between": "always",
+				"alphabetize": {
+					"order": "asc",
+					"caseInsensitive": true
+				}
+			}
+		],
+		"sort-imports": [
+			"error",
+			{
+				"ignoreDeclarationSort": true
+			}
+		],
+		"react/prop-types": 0,
+		"no-unused-vars": "off",
+		"unused-imports/no-unused-imports": "error",
+		"unused-imports/no-unused-vars": [
+			"warn",
+			{
+				"vars": "all",
+				"varsIgnorePattern": "^_",
+				"args": "after-used",
+				"argsIgnorePattern": "^_"
+			}
+		],
+		"unicorn/prevent-abbreviations": "off",
+		"unicorn/no-null": "off"
+	}
+}

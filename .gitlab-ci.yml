@@ -1,0 +1,118 @@
+image: docker:20.10.17
+
+stages:
+  - tag version
+  - build
+  - build latest image
+  - build tagged image
+  - deploy on vm
+  - sonarqube-check
+  - build tagged image
+
+variables:
+  IMG_NAME: saad-web
+
+tag version:
+  stage: tag version
+  image: node:18-alpine
+  only:
+    - production
+  before_script:
+    - apk upd  te && apk add git
+    - export VERSION=$(node -p "require('./package.json').version")
+  script:
+    - git remote remove origin
+    - git tag | xargs git tag -d
+    - git remote add origin https://$SAAD_USER:$SAAD_PASS@git.pti.org.br/lasse/convenio-lasse/saad/saad-web.git
+    - git config user.email gedt@pti.org.br
+    - git config user.name $CI_PROJECT_NAME
+    - git tag -a $VERSION -m "Versão $VERSION"
+    - git push origin $VERSION
+
+build:
+  stage: build
+  image: node:18-alpine
+  only:
+    - homologation
+    - tags
+  before_script:
+    - npm i --silent
+  script:
+    - npm run build -- --mode ${CI_COMMIT_BRANCH:-production}
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - dist
+
+build latest image:
+  stage: build latest image
+  image: docker:20.10.17
+  only:
+    - homologation
+  services:
+    - docker:20.10.17-dind
+  before_script:
+    - docker login -u $HARBOR_USER -p $HARBOR_PASS $HARBOR_URL
+  script:
+    - docker build . -t $HARBOR_URL/saad/$IMG_NAME:latest -t $HARBOR_URL/saad/$IMG_NAME:$CI_COMMIT_SHA
+    - docker push $HARBOR_URL/saad/$IMG_NAME:latest
+    - docker push $HARBOR_URL/saad/$IMG_NAME:$CI_COMMIT_SHA
+  after_script:
+    - docker logout $HARBOR_URL
+
+build tagged image:
+  stage: build tagged image
+  image: docker:20.10.17
+  only:
+    - tags
+  except:
+    - branches
+  services:
+    - docker:20.10.17-dind
+  before_script:
+    - docker login -u $HARBOR_USER -p $HARBOR_PASS $HARBOR_URL
+    - export TAG_VERSION=${CI_COMMIT_REF_NAME}
+  script:
+    - docker build . -t $HARBOR_URL/saad/$IMG_NAME:$TAG_VERSION
+    - docker push $HARBOR_URL/saad/$IMG_NAME:$TAG_VERSION
+  after_script:
+    - docker logout $HARBOR_URL
+
+deploy on vm:
+  stage: deploy on vm
+  image: docker:20.10.17
+  services:
+    - docker:20.10.17-dind
+  cache: {}
+  only:
+    - homologation
+  variables:
+    COMMAND: "cd saad-v2/ && docker login -u '$HARBOR_USER' -p '$HARBOR_PASS' $HARBOR_URL
+&& docker compose pull && docker compose up --force-recreate -d && docker
+logout $HARBOR_URL"
+  script:
+    - echo $COMMAND
+    - 'which ssh-agent || ( apk update && apk add openssh-client )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 -d)
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh -o StrictHostKeyChecking=no -l $SERVER_USER $SERVER_IP $COMMAND
+
+sonarqube-check:
+  stage: sonarqube-check
+  image: 
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" 
+    GIT_DEPTH: "0"
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script: 
+    - sonar-scanner
+  allow_failure: true
+  only:
+    - development
