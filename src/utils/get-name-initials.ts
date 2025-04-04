@@ -1,8 +1,7 @@
-export const getNameInitials = (name: string, surname: string) => {
+export const getNameInitials = (name: string) => {
 	const stNameInitial = name.charAt(0)
-	const lastNameInitial = surname.split(' ').pop()?.charAt(0)
 
-	const initials = (stNameInitial ?? '') + (lastNameInitial ?? '')
+	const initials = (stNameInitial ?? '') 
 
 	return initials.toUpperCase()
 }

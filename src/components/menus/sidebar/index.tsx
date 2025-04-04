@@ -7,7 +7,6 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import LanguageSwitcher from './language-switcher'
 import { SidebarContainer, StyledToggleButtonGroup } from './style'
 import { Text } from '../../ui/text'
-import ElectricalPanel from '@/assets/images/electrical-panel.svg?react'
 import Br from '@/assets/images/flags/br.svg?react'
 import Py from '@/assets/images/flags/py.svg?react'
 import { isSidebarCollapsedAtom } from '@/contexts/atoms/sidebar'
@@ -40,31 +39,11 @@ export const Sidebar = () => {
 				value={pathname.split('/')[1]}
 				onChange={handleChange}
 			>
-				<ProtectedComponent role='UAR_LIST'>
-					<ToggleButton value='uars'>
-						<ElectricalPanel />
-						{!isCollapsed && formatMessage({ id: 'uar.acronym' })}
-					</ToggleButton>
-				</ProtectedComponent>
+			
 
-				<ProtectedComponent role='ALARM_LIST'>
-					<ToggleButton value='alarms'>
-						<WarningSquare />
-						{!isCollapsed && formatMessage({ id: 'alarm.title.plural' })}
-					</ToggleButton>
-				</ProtectedComponent>
+			
 
-				<ProtectedComponent role='INSTRUMENT_LIST'>
-					<ToggleButton value='instruments'>
-						<Temperature />
-						{!isCollapsed && formatMessage({ id: 'instrument.title.plural' })}
-					</ToggleButton>
-				</ProtectedComponent>
-
-				<ToggleButton value='analysis'>
-					<ChartArea />
-					{!isCollapsed && formatMessage({ id: 'analysis.title.singular' })}
-				</ToggleButton>
+			
 
 				<ProtectedComponent role={['AUTH_GROUP_LIST', 'AUTH_USER_LIST']}>
 					<ToggleButton value='auth'>
@@ -73,12 +52,7 @@ export const Sidebar = () => {
 					</ToggleButton>
 				</ProtectedComponent>
 
-				<ProtectedComponent role='ALARM_COLOR_UPDATE'>
-					<ToggleButton value='settings'>
-						<Settings />
-						{!isCollapsed && formatMessage({ id: 'setting.title.plural' })}
-					</ToggleButton>
-				</ProtectedComponent>
+			
 			</StyledToggleButtonGroup>
 
 			<Stack alignItems='center' gap={8} mb={3} width='100%'>

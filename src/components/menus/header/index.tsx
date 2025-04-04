@@ -5,8 +5,7 @@ import { Stack } from '@mui/material'
 import { useAtom } from 'jotai'
 
 import { HeaderContainer } from './style'
-import Logo from '@/assets/images/logo.svg?react'
-import Logotype from '@/assets/images/logotype.svg?react'
+import Logotype from '@/assets/images/sarf_logotype_fonte_suave.svg?react'
 import { IconButton } from '@/components/ui/inputs/icon-button'
 import { UserAvatar } from '@/components/user/avatar'
 import { isSidebarCollapsedAtom } from '@/contexts/atoms/sidebar'
@@ -30,9 +29,8 @@ export const Header = () => {
 					)}
 				</IconButton>
 
-				<Logo width={40} height={40} />
 
-				<Logotype />
+				<Logotype width={200} />
 			</Stack>
 
 			<UserAvatar />

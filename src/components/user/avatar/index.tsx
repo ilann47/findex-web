@@ -20,12 +20,12 @@ export const UserAvatar = () => {
 	return (
 		<>
 			<IconButton onClick={(e) => openPopover(popoverRef)(e.currentTarget)} tooltip='auth.user.title.singular'>
-				<Avatar variant='rounded'>{getNameInitials(user.name, user.surname)}</Avatar>
+				<Avatar variant='rounded'>{getNameInitials(user.email)}</Avatar>
 			</IconButton>
 
 			<Popover ref={popoverRef} gap={0.5}>
 				<Typography variant='h1' fontSize={18}>
-					{user.name + ' ' + user.surname}
+					{user.email }
 				</Typography>
 				<Typography color={(theme) => theme.palette.juicy.neutral[70]}>{user?.email}</Typography>
 
