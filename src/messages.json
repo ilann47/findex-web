@@ -556,6 +556,11 @@
 		},
 		"auth": {
 			"login": {
+				"loading": "Acessando conta....",
+				"button": "Entrar", 
+				"noAccount": "Não possui conta?",
+				"registerNow": "Registrar-se",
+				"forgotPassword": "Esqueceu a senha?",
 				"feedback": {
 					"success": "Autenticação realizada com sucesso!",
 					"wrong-credentials": "Usuário e/ou senha incorretos!"
@@ -1234,6 +1239,11 @@
 		},
 		"auth": {
 			"login": {
+				"loading": "Accesando cuenta....",
+				"button": "Accesar", 
+				"noAccount": "¿No tienes una cuenta?",
+				"registerNow": "Registrar-se",
+				"forgotPassword": "¿Olvidaste tu contraseña?",
 				"feedback": {
 					"success": "Autenticación correcta.",
 					"wrong-credentials": "Nombre de usuario y/o contraseña incorrectos"
