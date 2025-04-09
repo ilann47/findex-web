@@ -402,6 +402,11 @@
 			},
 			"current-color": "Cor atual"
 		},
+		"welcome": {
+			"title": "Bem-vindo ao SARF",
+			"description": " ",
+			"role-warning": "Caso não esteja conseguindo acessar nenhuma página além dessa, significa que o seu usuário está sem as permissões necessárias. Contate o administrador do sistema."
+		},
 		"table": {
 			"columns": "Colunas",
 			"rows-per-page": "Linhas por página",
@@ -550,6 +555,12 @@
 			"saturday": "Sábado"
 		},
 		"auth": {
+			"login": {
+				"feedback": {
+					"success": "Autenticação realizada com sucesso!",
+					"wrong-credentials": "Usuário e/ou senha incorretos!"
+				}
+			},
 			"exit-confirmation": {
 				"title": "Deseja sair do sistema?",
 				"description": "Você só poderá voltar a utilizá-lo depois de se autenticar novamente!"
@@ -581,7 +592,11 @@
 					"title": "SAAD - Usuários"
 				},
 				"username": "Nome de usuário",
-				"email": "Email"
+				"email": "Email",
+				"password": "Senha",
+				"feedback": {
+					"update-table-settings": "Configurações de tabela salvas com sucesso!"
+				}
 			},
 			"role": {
 				"title": {
@@ -1064,6 +1079,11 @@
 			},
 			"current-color": "Color actual"
 		},
+		"welcome": {
+			"title": "Bienvenido al SARF",
+			"description": " ",
+			"role-warning": "Si no puedes acceder a ninguna página que no sea ésta, significa que tu usuario no tiene los permisos necesarios. Póngase en contacto con el administrador del sistema."
+		},
 		"table": {
 			"columns": "Columnas",
 			"rows-per-page": "Líneas por página",
@@ -1213,6 +1233,12 @@
 			"saturday": "Sábado"
 		},
 		"auth": {
+			"login": {
+				"feedback": {
+					"success": "Autenticación correcta.",
+					"wrong-credentials": "Nombre de usuario y/o contraseña incorrectos"
+				}
+			},
 			"exit-confirmation": {
 				"title": "¿Quieres abandonar el sistema?",
 				"description": "Sólo podrás volver a utilizarla cuando hayas iniciado sesión de nuevo."
@@ -1244,7 +1270,11 @@
 					"title": "SAAD - Usuários"
 				},
 				"username": "Nombre de usuario",
-				"email": "Correo electrónico"
+				"email": "Correo electrónico",
+				"password": "Contraseña",
+				"feedback": {
+					"update-table-settings": "Configurações de tabela salvas com sucesso!"
+				}
 			},
 			"role": {
 				"title": {

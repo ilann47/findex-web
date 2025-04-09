@@ -35,27 +35,8 @@ export const UsersTable = ({ groupName }: Props) => {
 	const columnHelper = createColumnHelper<User>()
 
 	const columns: ColumnDef<User>[] = [
-		columnHelper.accessor('name', {
-			id: 'name',
-			header: formatMessage('name'),
-			meta: {
-				filter: { type: 'text', id: 'name' },
-			},
-		}),
-		columnHelper.accessor('surname', {
-			id: 'surname',
-			header: formatMessage('surname'),
-			meta: {
-				filter: { type: 'text', id: 'surname' },
-			},
-		}),
-		columnHelper.accessor('username', {
-			id: 'username',
-			header: formatMessage('auth.user.username'),
-			meta: {
-				filter: { type: 'text', id: 'username' },
-			},
-		}),
+
+
 		columnHelper.accessor('email', {
 			id: 'email',
 			header: formatMessage('auth.user.email'),

@@ -9,11 +9,18 @@ interface Props<T extends object> {
 	control: Control<T>
 	name: Path<T>
 	nullable?: boolean
+	clearable?: boolean
 }
 
 type ControlledTextFieldProps<T extends object> = Props<T> & TextFieldProps
 
-const ControlledTextField = <T extends object>({ control, name, nullable, ...props }: ControlledTextFieldProps<T>) => {
+const ControlledTextField = <T extends object>({
+	control,
+	name,
+	nullable,
+	clearable = true,
+	...props
+}: ControlledTextFieldProps<T>) => {
 	const formatMessage = useFormatMessage()
 
 	return (
@@ -30,9 +37,10 @@ const ControlledTextField = <T extends object>({ control, name, nullable, ...pro
 					fullWidth
 					value={field.value || ''}
 					InputProps={{
-						endAdornment: field.value ? (
-							<ClearInput onClick={() => field.onChange(nullable ? null : '')} />
-						) : null,
+						endAdornment:
+							clearable && field.value ? (
+								<ClearInput onClick={() => field.onChange(nullable ? null : '')} />
+							) : null,
 					}}
 				/>
 			)}

@@ -1,18 +1,19 @@
-import { lazy } from 'react';
+import { lazy } from 'react'
 
-import { Navigate, createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom'
 
 import { NavigationLayout } from './layouts/navigation'
+import { ProtectedRouteLayout } from './layouts/protected/route'
+import ErrorFallbackPage from './pages/error/fallback'
+import ForbiddenPage from './pages/error/forbidden'
+import NotFoundPage from './pages/error/not-found'
+import WelcomePage from './pages/welcome'
 
-import { ProtectedRouteLayout } from './layouts/protected/route';
-import ErrorFallbackPage from './pages/error/fallback';
-import ForbiddenPage from './pages/error/forbidden';
-import NotFoundPage from './pages/error/not-found';
+const LoginPage = lazy(() => import('@/pages/auth/login'))
+const AuthenticationPage = lazy(() => import('@/pages/authentication'))
+const UserPage = lazy(() => import('@/pages/user'))
+const GroupPage = lazy(() => import('@/pages/group'))
 
-// Páginas relacionadas à autenticação
-const AuthenticationPage = lazy(() => import('@/pages/authentication'));
-const UserPage = lazy(() => import('@/pages/user'));
-const GroupPage = lazy(() => import('@/pages/group'));
 
 export const router = createBrowserRouter([
 	{
@@ -24,8 +25,8 @@ export const router = createBrowserRouter([
 				element: <NavigationLayout />,
 				children: [
 					{
-					index: true,
-					element: <Navigate to='/auth' replace />,
+						index: true,
+						element: <WelcomePage />,
 					},
 					{
 						path: 'auth',
@@ -63,6 +64,10 @@ export const router = createBrowserRouter([
 						],
 					},
 				],
+			},
+			{
+				path: 'login',
+				element: <LoginPage />,
 			},
 			{
 				path: 'unauthorized',

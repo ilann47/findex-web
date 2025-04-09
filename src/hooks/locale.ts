@@ -3,7 +3,7 @@ import { useCallback, useEffect } from 'react'
 import { useAtom } from 'jotai'
 
 import { localeAtom } from '@/contexts/atoms/locale'
-import { saadAPI } from '@/service/saad'
+import { saadAPI } from '@/shared/saad'
 import { Locale } from '@/types/i18n'
 import { addRequestHeaderFields } from '@/utils/add-request-header-fields'
 

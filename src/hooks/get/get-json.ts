@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { Service } from '@/service'
-import { saadAPI } from '@/service/saad'
+import { saadAPI } from '@/shared/saad'
 
 interface ParamsGetBy {
 	endpoint: string

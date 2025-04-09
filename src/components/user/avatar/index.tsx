@@ -1,5 +1,6 @@
 import { Logout } from '@carbon/icons-react'
 import { Avatar, Typography } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/inputs/button'
 import { IconButton } from '@/components/ui/inputs/icon-button'
@@ -15,6 +16,8 @@ export const UserAvatar = () => {
 	const popoverRef = usePopover()
 	const confirmationModalRef = useModal()
 
+	const navigate = useNavigate()
+
 	if (!user) return null
 
 	return (
@@ -25,7 +28,7 @@ export const UserAvatar = () => {
 
 			<Popover ref={popoverRef} gap={0.5}>
 				<Typography variant='h1' fontSize={18}>
-					{user.email }
+					{user.email}
 				</Typography>
 				<Typography color={(theme) => theme.palette.juicy.neutral[70]}>{user?.email}</Typography>
 
@@ -41,7 +44,10 @@ export const UserAvatar = () => {
 				modalRef={confirmationModalRef}
 				title='auth.exit-confirmation.title'
 				description='auth.exit-confirmation.description'
-				onConfirm={logout}
+				onConfirm={() => {
+					logout()
+					navigate('/login')
+				}}
 			/>
 		</>
 	)

@@ -7,7 +7,7 @@ import { usePagination } from '../pagination'
 import { useSorting } from '../sorting'
 import { ReturnType } from '@/schemas/pageable'
 import { Service } from '@/service'
-import { saadAPI } from '@/service/saad'
+import { saadAPI } from '@/shared/saad'
 
 export interface GetParams {
 	endpoint: string

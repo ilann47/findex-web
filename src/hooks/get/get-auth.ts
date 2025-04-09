@@ -1,15 +1,12 @@
-import { useEffect } from 'react'
-
 import { useQuery } from '@tanstack/react-query'
 
 import { GetParams, useGetAll, useGetPageable } from '.'
 import { useFiltering } from '../filter/filtering'
-import { useToast } from '../toast'
 import { KEYCLOAK_ID_CLIENT, KEYCLOAK_REALM } from '@/constants/auth'
 import { ENDPOINTS } from '@/constants/endpoints'
 import { ReturnType } from '@/schemas/pageable'
 import { Service } from '@/service'
-import { saadAPI } from '@/service/saad'
+import { saadAPI } from '@/shared/saad'
 import { getAuthLikeFilter } from '@/utils/auth'
 
 interface ParamsGetBy {
@@ -22,10 +19,9 @@ interface ParamsGetBy {
 
 export const useAuthGetOne = <T extends object>({ endpoint, enabled, idParam }: ParamsGetBy) => {
 	const service = new Service<T>(saadAPI, `${ENDPOINTS.AUTH}/${endpoint}/id`)
-	const { notifyError } = useToast()
 
-	const { data, error, isLoading } = useQuery({
-		queryKey: [`${ENDPOINTS.AUTH}/${endpoint}`, idParam],
+	const { data, isLoading } = useQuery({
+		queryKey: [`${ENDPOINTS.AUTH}/${endpoint}`],
 		queryFn: async () =>
 			await service.getOne({
 				realm: KEYCLOAK_REALM,
@@ -33,12 +29,6 @@ export const useAuthGetOne = <T extends object>({ endpoint, enabled, idParam }: 
 			}),
 		enabled,
 	})
-
-	useEffect(() => {
-		if (error) {
-			notifyError('message.request.error')
-		}
-	}, [error])
 
 	return { data, isLoading }
 }

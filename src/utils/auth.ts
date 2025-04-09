@@ -1,7 +1,7 @@
 import { jwtDecode } from 'jwt-decode'
 
 import { KEYCLOAK_CLIENT } from '@/constants/auth'
-import { KeycloakToken, User } from '@/schemas/auth'
+import { AccessToken, User } from '@/schemas/auth'
 
 export const getUserFromToken = (token?: string | null): User | null => {
 	if (!token) return null
@@ -21,7 +21,15 @@ export const getUserFromToken = (token?: string | null): User | null => {
 	return user
 }
 
-export const decodeToken = (token: string) => jwtDecode<KeycloakToken>(token as string)
+export const decodeToken = (token: string) => jwtDecode<AccessToken>(token as string)
+
+export const getExpirationTime = (token: string | null): number => {
+	if (!token) return 0
+
+	const tokenAsObject = decodeToken(token)
+
+	return tokenAsObject.exp
+}
 
 // Keycloak adapter filter patterns
 export const getAuthEqualsFilter = (value: string) => `EQUALS,${value}`

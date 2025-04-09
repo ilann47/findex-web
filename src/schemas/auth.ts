@@ -3,11 +3,28 @@ import { Group } from '@carbon/icons-react'
 import z from './zod'
 import { KEYCLOAK_CLIENT, ROLES } from '@/constants/auth'
 
+export const credentialsSchema = z.object({
+	username: z.string().min(1),
+	password: z.string().min(1),
+})
+
+export type Credentials = z.output<typeof credentialsSchema>
+
 const roleNameSchema = z.enum(ROLES)
 
 export type RoleName = z.output<typeof roleNameSchema>
 
-const keycloakTokenSchema = z.object({
+export const openIDSchema = z.object({
+	access_token: z.string(),
+	expires_in: z.number(),
+	refresh_expire_in: z.number(),
+	refresh_token: z.string(),
+	token_type: z.string(),
+})
+
+export type OpenID = z.output<typeof openIDSchema>
+
+const accessTokenSchema = z.object({
 	exp: z.number(),
 	typ: z.string(),
 	given_name: z.string(),
@@ -23,7 +40,7 @@ const keycloakTokenSchema = z.object({
 	}),
 })
 
-export type KeycloakToken = z.output<typeof keycloakTokenSchema>
+export type AccessToken = z.output<typeof accessTokenSchema>
 
 const userSchema = z.object({
 	id: z.string(),
