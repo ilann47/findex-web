@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useTransition } from 'react';
 
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
@@ -28,6 +28,7 @@ const LoginPage = () => {
 	const navigate = useNavigate();
 	const formatMessage = useFormatMessage();
 	const [showPassword, setShowPassword] = useState(false);
+    const [isPending, startTransition] = useTransition(); 
 
 	const form = useForm<Credentials>({
 		defaultValues: { password: '', username: '' },
@@ -54,7 +55,9 @@ const LoginPage = () => {
 						});
 					},
 					() => {
-						navigate('/');
+                        startTransition(() => {
+                            navigate('/');
+                        });
 					}
 				);
 			} catch (error) {
@@ -62,7 +65,7 @@ const LoginPage = () => {
 				form.setError('root.unexpected', { type: 'manual', message: 'An unexpected error occurred.' });
 			}
 		},
-		[form, login, navigate, formatMessage]
+		[form, login, navigate, formatMessage, startTransition]
 	);
 
 	const inputBackgroundColor = theme.palette.grey[100]; 
@@ -201,7 +204,7 @@ const LoginPage = () => {
 						sx={{ py: 1.5, textTransform: 'none', fontSize: '1rem' }}
 						disabled={form.formState.isSubmitting}
 					>
-						{form.formState.isSubmitting
+						{form.formState.isSubmitting || isPending 
 							? (formatMessage('auth.login.loading') || 'Logging in...')
 							: (formatMessage('auth.login.button') || 'Login')}
 					</Button>

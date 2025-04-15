@@ -405,7 +405,7 @@
 		"welcome": {
 			"title": "Bem-vindo ao SARF",
 			"description": " ",
-			"role-warning": "Caso não esteja conseguindo acessar nenhuma página além dessa, significa que o seu usuário está sem as permissões necessárias. Contate o administrador do sistema."
+			"role-warning": "Caso não esteja conseguindo acessar nenhuma página além dessa, significa que o seu usuário está sem as permissões necessárias. Tente reiniciar a página. Se continuar, Contate o administrador do sistema."
 		},
 		"table": {
 			"columns": "Colunas",
@@ -451,13 +451,15 @@
 			"delete": "Apagar",
 			"cancel": "Cancelar",
 			"required-field-error": "Campo obrigatório",
+			"invalid": "Valor inválido",
 			"confirm": "Confirmar",
 			"supported-formats": "Formatos suportados: {formats}",
 			"max-size": "Tamanho máximo: {size}",
 			"too-large-file": "Só é possível inserir arquivos de até {size} ",
 			"drop-file": "Araste e solte o arquivo aqui ou <b>escolha um arquivo</b>",
 			"save": "Salvar alterações",
-			"clear-selection": "Limpar seleção"
+			"clear-selection": "Limpar seleção",
+			"unexpected": "Erro: Algo Inesperado aconteceu ao executar a tarefa!."
 		},
 		"message": {
 			"request": {
@@ -566,6 +568,20 @@
 					"wrong-credentials": "Usuário e/ou senha incorretos!"
 				}
 			},
+			"register": {
+				"loading": "Criando conta....",
+				"button": "Registrar",
+				"noAccount": "Já possui conta?",
+				"loginNow": "Entrar",
+				"passwordTooShort": "Senha muito curta!",
+				"invalid-email": "Email inválido!",
+				"feedback": {
+					"success": "Conta criada com sucesso!",
+					"email-exists": "E-mail já existe em nosso sistema!",
+					"wrong-credentials": "Senhas não coincidem!"
+				}
+				
+			},
 			"exit-confirmation": {
 				"title": "Deseja sair do sistema?",
 				"description": "Você só poderá voltar a utilizá-lo depois de se autenticar novamente!"
@@ -599,6 +615,7 @@
 				"username": "Nome de usuário",
 				"email": "Email",
 				"password": "Senha",
+				"confirmPass": "Confirmar senha",
 				"feedback": {
 					"update-table-settings": "Configurações de tabela salvas com sucesso!"
 				}
@@ -1087,7 +1104,7 @@
 		"welcome": {
 			"title": "Bienvenido al SARF",
 			"description": " ",
-			"role-warning": "Si no puedes acceder a ninguna página que no sea ésta, significa que tu usuario no tiene los permisos necesarios. Póngase en contacto con el administrador del sistema."
+			"role-warning": "Si no puedes acceder a ninguna página que no sea ésta, significa que tu usuario no tiene los permisos necesarios. Intenta reiniciar la página. Si sigue igual, Póngase en contacto con el administrador del sistema."
 		},
 		"table": {
 			"columns": "Columnas",
@@ -1134,6 +1151,7 @@
 			"delete": "Borrar",
 			"cancel": "Cancelar",
 			"required-field-error": "Campo obligatorio",
+			"invalid" : "Valor inválido",
 			"confirm": "Confirme",
 			"supported-formats": "Formatos admitidos: {formats}",
 			"max-size": "Tamaño máximo: {size}",
@@ -1248,6 +1266,18 @@
 					"success": "Autenticación correcta.",
 					"wrong-credentials": "Nombre de usuario y/o contraseña incorrectos"
 				}
+			},
+			"register": {
+				"loading": "Creando cuenta....",
+				"button": "Registrar",
+				"noAccount": "Ya tienes cuenta?",
+				"loginNow": "Entrar",
+				
+				"feedback": {
+					"success": "Cuenta creada con suceso!",
+					"email-exists": "E-mail ya existente!"
+				}
+				
 			},
 			"exit-confirmation": {
 				"title": "¿Quieres abandonar el sistema?",

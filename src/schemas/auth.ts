@@ -88,3 +88,50 @@ export const removeRolesFormSchema = authParamsSchema.extend({
 })
 
 export type RemoveRolesForm = z.infer<typeof removeRolesFormSchema>
+
+
+
+
+
+
+export const CreateUserResponseSchema = z.object({
+    id: z.string().optional(),
+    userId: z.string().optional(),
+})
+.passthrough()
+.refine(data => data.id !== undefined || data.userId !== undefined, {
+    message: "Successful user creation response should contain either 'id' or 'userId'",
+});
+
+export type CreateUserResponse = z.infer<typeof CreateUserResponseSchema>;
+
+
+// Em schemas/auth.ts
+
+const CredentialsSchema = z.object({
+    type: z.literal('password').default('password'),
+    temporary: z.boolean().default(false),         
+    value: z.string().min(1, 'form.required-field-error' ).min(8, 'auth.register.passwordTooShort'), 
+    confirmValue: z.string().min(1, 'form.required-field-error'),
+});
+
+
+export const CreateUserRequestPayloadSchema = z.object({
+    params: z.object({
+        realm: z.string().optional()
+    }).optional(), 
+                   
+
+    username: z.string(),
+    name: z.string().optional(),
+    surname: z.string().optional(),
+    enabled: z.boolean().default(true), 
+    email: z.string().min(1, 'form.required-field-error').email('auth.register.invalid-email'),
+
+    credentials: CredentialsSchema, 
+
+    attributes: z.record(/*...*/)
+    .nullable()
+    .optional(),
+});
+  export type CreateUserRequestPayload = z.infer<typeof CreateUserRequestPayloadSchema>;

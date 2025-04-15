@@ -9,7 +9,7 @@ import { useAuthGetOne } from '../get/get-auth'
 import { useToast } from '../toast'
 import { ENDPOINTS } from '@/constants/endpoints'
 import { accessTokenAtom, refreshTokenAtom, tabFocusedTimeAtom, userAtom } from '@/contexts/atoms/auth'
-import { Credentials, RoleName, User } from '@/schemas/auth'
+import { Credentials, RoleName, User, CreateUserRequestPayload } from '@/schemas/auth'
 import { KeycloakService } from '@/service/keycloak'
 import { saadAPI } from '@/shared/saad'
 import { addRequestHeaderFields } from '@/utils/add-request-header-fields'
@@ -72,6 +72,26 @@ export const useAuth = () => {
 		}
 	}, [])
 
+	const register = useCallback(async (register: CreateUserRequestPayload, onError: () => void, onSuccess: () => void) => {
+		try {
+			console.log('useAuth: Calling keycloakService.createUser...'); 
+
+			await keycloakService.createUser(register)
+
+			queryClient.invalidateQueries()
+
+			notifySuccess('auth.login.feedback.success')
+
+			onSuccess()
+		} catch (error) {
+			console.log(error)
+
+			notifyError('auth.login.feedback.wrong-credentials')
+
+			onError()
+		}
+	}, [])
+
 	const userHasRole = useCallback((roleName: RoleName) => user?.roles.some((role) => role == roleName), [user])
 
 	const refreshSession = useCallback(async () => {
@@ -100,6 +120,7 @@ export const useAuth = () => {
 		user,
 		login,
 		logout,
+		register,
 		userHasRole,
 		refreshSession,
 		refreshAccessToken,

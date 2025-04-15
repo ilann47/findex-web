@@ -8,6 +8,7 @@ import ErrorFallbackPage from './pages/error/fallback'
 import ForbiddenPage from './pages/error/forbidden'
 import NotFoundPage from './pages/error/not-found'
 import WelcomePage from './pages/welcome'
+import RegisterPage from './pages/auth/signup'
 
 const LoginPage = lazy(() => import('@/pages/auth/login'))
 const AuthenticationPage = lazy(() => import('@/pages/authentication'))
@@ -68,6 +69,10 @@ export const router = createBrowserRouter([
 			{
 				path: 'login',
 				element: <LoginPage />,
+			},
+			{
+				path: 'register',
+				element: <RegisterPage />,
 			},
 			{
 				path: 'unauthorized',
