@@ -1,14 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { Service } from '@/service'
-import { saadAPI } from '@/shared/saad'
+import { sarfAPI } from '@/shared/sarf'
 
 interface ParamsGetBy {
 	endpoint: string
 }
 
 export const useGetJson = <T extends object>({ endpoint }: ParamsGetBy) => {
-	const service = new Service<T>(saadAPI, endpoint)
+	const service = new Service<T>(sarfAPI, endpoint)
 
 	const { data, isLoading } = useQuery({
 		queryKey: [endpoint],

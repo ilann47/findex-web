@@ -565,10 +565,24 @@
 				"forgotPassword": "Esqueceu a senha?",
 				"feedback": {
 					"success": "Autenticação realizada com sucesso!",
-					"wrong-credentials": "Usuário e/ou senha incorretos!"
+					"wrong-credentials": "Usuário e/ou senha incorretos!",
+					"error": "Lamento, ocorreu um erro na requisição!"
+
 				}
 			},
 			"register": {
+				"email": {
+					"resend-cooldown": "Reenviar código em ",
+					"invalid-code": "Código Inválido",
+					"validate-email-code": "Código",
+					"validate-email": "Código de verificação",
+					"info-validate-email": "E-mail não confirmado.",
+					"info-validate-detail": "Enviamos um código de validação para o email ",
+					"code-in-verification": "Verificando código....",
+					"code-verification": "Continuar",
+					"wrong-email": "Email informado equivocado? ",
+					"resend-code": "Reenviar código de verificação"
+				},
 				"loading": "Criando conta....",
 				"button": "Registrar",
 				"noAccount": "Já possui conta?",
@@ -578,7 +592,9 @@
 				"feedback": {
 					"success": "Conta criada com sucesso!",
 					"email-exists": "E-mail já existe em nosso sistema!",
-					"wrong-credentials": "Senhas não coincidem!"
+					"wrong-credentials": "Senhas não coincidem!",
+					"invalid-verification-code": "Código inválido!",
+					"error": "Lamento, ocorreu um erro na requisição!"
 				}
 				
 			},

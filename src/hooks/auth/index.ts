@@ -9,13 +9,49 @@ import { useAuthGetOne } from '../get/get-auth'
 import { useToast } from '../toast'
 import { ENDPOINTS } from '@/constants/endpoints'
 import { accessTokenAtom, refreshTokenAtom, tabFocusedTimeAtom, userAtom } from '@/contexts/atoms/auth'
-import { Credentials, RoleName, User, CreateUserRequestPayload } from '@/schemas/auth'
+import { Credentials, RoleName, User, CreateUserRequestPayload, EmailSchema, VerificationCode } from '@/schemas/auth'
 import { KeycloakService } from '@/service/keycloak'
-import { saadAPI } from '@/shared/saad'
+import { sarfAPI } from '@/shared/sarf'
 import { addRequestHeaderFields } from '@/utils/add-request-header-fields'
 import { getExpirationTime } from '@/utils/auth'
+import { isAxiosError } from 'axios';
+import { Email } from '@carbon/icons-react'
 
 const keycloakService = new KeycloakService()
+
+function isKeycloakSetupError(error: unknown): boolean {
+    if (isAxiosError(error) && error.response?.data) {
+        const errorData = error.response.data;
+        return (
+            errorData.error === 'invalid_grant' &&
+            typeof errorData.error_description === 'string' &&
+            errorData.error_description.includes('Account is not fully set up')
+        );
+    }
+    return false;
+}
+function isKeycloakEmailAlreadyRecorded(error: unknown): boolean {
+    if (
+        isAxiosError(error) &&
+        error.response &&
+        error.response.data &&
+        typeof error.response.data === 'object' && 
+        error.response.data !== null
+       ) {
+        const errorData = error.response.data ; 
+
+        if (
+            errorData.message &&
+            typeof errorData.message === 'object' &&
+            typeof errorData.message.en === 'string'
+           ) {
+            return errorData.message.en.includes('A user already has this email');
+        }
+    }
+
+    return false;
+}
+
 
 export const useAuth = () => {
 	const { notifyError, notifySuccess } = useToast()
@@ -52,45 +88,153 @@ export const useAuth = () => {
 		setRefreshAccessToken(refreshToken)
 	}, [])
 
-	const login = useCallback(async (credentials: Credentials, onError: () => void, onSuccess: () => void) => {
-		try {
-			const { access_token, refresh_token } = await keycloakService.login(credentials)
+	const login = useCallback(
+        async (
+            credentials: Credentials,
+            onError: (error: unknown) => void,
+            onSuccess: () => void
+        ) => {
+            try {
+                const { access_token, refresh_token } = await keycloakService.login(credentials);
 
-			updateSession(access_token, refresh_token)
+                updateSession(access_token, refresh_token);
+
+                queryClient.invalidateQueries(); 
+
+                notifySuccess('auth.login.feedback.success');
+
+                onSuccess();
+            } catch (error) {
+				console.log(error)
+
+                if (isKeycloakSetupError(error)) {
+                    onError(error);
+                } else {
+                    notifyError('auth.login.feedback.wrong-credentials');
+                    onError(error);
+                }
+            }
+        },
+        [keycloakService, updateSession, queryClient, notifySuccess, notifyError]
+    );
+
+	const register = useCallback(async (registerData: CreateUserRequestPayload, onError: (error: unknown) => void, onSuccess: () => void) => {
+		try {
+			await keycloakService.createUser(registerData)
 
 			queryClient.invalidateQueries()
 
-			notifySuccess('auth.login.feedback.success')
+			notifySuccess('auth.register.feedback.success')
 
 			onSuccess()
 		} catch (error) {
 			console.log(error)
 
-			notifyError('auth.login.feedback.wrong-credentials')
-
-			onError()
+			if (isKeycloakEmailAlreadyRecorded(error)) {
+				notifyError('auth.register.feedback.email-exists');
+				onError(error);
+			} else {
+				notifyError('auth.register.feedback.error');
+				onError(error);
+			}
 		}
-	}, [])
+	}, [keycloakService, queryClient, notifySuccess, notifyError]) 
 
-	const register = useCallback(async (register: CreateUserRequestPayload, onError: () => void, onSuccess: () => void) => {
-		try {
-			console.log('useAuth: Calling keycloakService.createUser...'); 
+	const email = useCallback(
+		async (
+			emailData: EmailSchema, 
+			onError: (error: unknown) => void,
+			onSuccess: (emailExisted: boolean) => void
+		) => {
+			let emailExisted = false; 
+			try {
+				await keycloakService.emailExists(emailData);
+	
+				emailExisted = true;
+	
+				await keycloakService.updateSendEmail(emailData);
+	
+			} catch (error: any) { 
+				if (error?.response?.status === 404) {
+					emailExisted = false;
+					try {
+						await keycloakService.createSendEmail(emailData);
+					} catch (createError) {
+						 console.error("Error during createSendEmail:", createError);
+						 notifyError('auth.register.feedback.error');
+						 onError(createError);
+						 return; 
+					}
+				} else {
+					console.error("Unexpected error checking email existence:", error);
+					notifyError('auth.login.feedback.error'); 
+					onError(error);
+					return; 
+				}
+			}
+	
+			try {
+				 queryClient.invalidateQueries();
+				 onSuccess(emailExisted);
+			} catch(finalError) {
+				 console.error("Error in final steps:", finalError);
+				 onError(finalError);
+			}
+	
+		},
+		[keycloakService, queryClient, notifyError ]
+	);
 
-			await keycloakService.createUser(register)
+	const validateEmail = useCallback(
+		async (
+			email: EmailSchema,
+			onError: (error: unknown) => void,
+			onSuccess: (emailExisted: boolean) => void
+		) => {
+			let validEmail = false; 
+			try {
+	
+				await keycloakService.validateEmail(email);
+	
+			} catch (error: any) { 
+					notifyError('auth.register.feedback.error');
+					onError(error);
 
-			queryClient.invalidateQueries()
+			}
+	
+			try {
+				 queryClient.invalidateQueries();
+				 onSuccess(validEmail);
+			} catch(finalError) {
+				 console.error("Error in final steps:", finalError);
+				 onError(finalError);
+			}
+	
+		},
+		[keycloakService, queryClient, notifyError ]
+	);
 
-			notifySuccess('auth.login.feedback.success')
+	const verifyEmail = useCallback(
+        async (
+            verificationCode: VerificationCode,
+            onError: (error: unknown) => void,
+            onSuccess: () => void
+        ) => {
+            try {
+                await keycloakService.verifyEmail(verificationCode);
 
-			onSuccess()
-		} catch (error) {
-			console.log(error)
 
-			notifyError('auth.login.feedback.wrong-credentials')
+                queryClient.invalidateQueries(); 
 
-			onError()
-		}
-	}, [])
+                onSuccess();
+            } catch (error) {
+				console.log(error)
+                notifyError('auth.login.feedback.error');
+                onError(error);
+            }
+        },
+        [keycloakService, updateSession, queryClient, notifySuccess, notifyError]
+    );
 
 	const userHasRole = useCallback((roleName: RoleName) => user?.roles.some((role) => role == roleName), [user])
 
@@ -113,13 +257,16 @@ export const useAuth = () => {
 	}, [refreshAccessToken])
 
 	useEffect(() => {
-		addRequestHeaderFields(saadAPI, { Authorization: `Bearer ${accessToken}` })
+		addRequestHeaderFields(sarfAPI, { Authorization: `Bearer ${accessToken}` })
 	}, [accessToken])
 
 	return {
 		user,
 		login,
 		logout,
+		email,
+		verifyEmail,
+		validateEmail,
 		register,
 		userHasRole,
 		refreshSession,

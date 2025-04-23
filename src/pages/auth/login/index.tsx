@@ -16,15 +16,22 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import ControlledTextField from '@/components/ui/inputs/text-field';
 import { useAuth } from '@/hooks/auth';
 import { useFormatMessage } from '@/hooks/i18n/format-message';
-import { Credentials } from '@/schemas/auth';
+import { Credentials, Email } from '@/schemas/auth';
 import { theme } from '@/theme';
+import { isAxiosError } from 'axios'; // Importar o type guard do Axios (recomendado)
 
 const SARF_LOGO_PATH = '/src/assets/images/sarf_logotype_fonte_suave.svg';
 const LEFT_DECORATION_PATH = '/src/assets/images/large-vertical-waves.svg';
 const RIGHT_DECORATION_PATH = '/src/assets/images/large-vertical-waves.svg'; 
 
+declare const login: (
+    data: Credentials,
+    onFailure: (errorDetails?: any) => void, // Pode manter ou simplificar se não usar mais detalhes aqui
+    onSuccess: () => void
+) => Promise<void>;
+
 const LoginPage = () => {
-	const { login } = useAuth();
+	const { login, email } = useAuth();
 	const navigate = useNavigate();
 	const formatMessage = useFormatMessage();
 	const [showPassword, setShowPassword] = useState(false);
@@ -39,35 +46,72 @@ const LoginPage = () => {
 		event.preventDefault();
 	};
 
+	function isKeycloakSetupError(error: unknown): boolean {
+        if (isAxiosError(error) && error.response?.data) {
+            const errorData = error.response.data;
+            return (
+                errorData.error === 'invalid_grant' &&
+                typeof errorData.error_description === 'string' &&
+                errorData.error_description.includes('Account is not fully set up')
+            );
+        }
+        return false;
+    }
+
+
 	const loginUser = useCallback(
-		async (data: Credentials) => {
-			try {
-				await login(
-					data,
-					() => {
-						form.setError('username', {
-							type: 'manual',
-							message: formatMessage('auth.login.feedback.wrong-credentials') || 'Invalid credentials',
-						});
-						form.setError('password', {
-							type: 'manual',
-							message: formatMessage('auth.login.feedback.wrong-credentials') || 'Invalid credentials',
-						});
-					},
-					() => {
+        // Remove 'emaildata' parameter
+        async (data: Credentials) => {
+            form.clearErrors();
+
+            try {
+                await login(
+                    data,
+                    // onError callback for the main 'login' function
+                    (errorDetails) => {
+                        if (isKeycloakSetupError(errorDetails)) {
+                            email(
+                                { email: data.username }, 
+                                () => {
+                                },
+                                () => {
+                                }
+                            );
+
+                            // Navigate after initiating the email call
+                            startTransition(() => {
+								const encodedEmail = encodeURIComponent(data.username);
+                                navigate(`/email?address=${encodedEmail}`);
+                            });
+                        } else {
+                            // Handle other login errors (e.g., wrong credentials)
+                            console.log("Credentials error or other login issue detected, setting form errors");
+                            form.setError('username', {
+                                type: 'manual',
+                                message: formatMessage('auth.login.feedback.wrong-credentials') || 'Invalid credentials',
+                            });
+                            form.setError('password', {
+                                type: 'manual',
+                                message: formatMessage('auth.login.feedback.wrong-credentials') || 'Invalid credentials',
+                            });
+                        }
+                    },
+                    // onSuccess callback for the main 'login' function
+                    () => {
                         startTransition(() => {
                             navigate('/');
                         });
-					}
-				);
-			} catch (error) {
-				console.error("Login failed unexpectedly:", error);
-				form.setError('root.unexpected', { type: 'manual', message: 'An unexpected error occurred.' });
-			}
-		},
-		[form, login, navigate, formatMessage, startTransition]
-	);
-
+                    }
+                );
+            } catch (error) {
+                 // Catch unexpected errors during the process
+                 console.error("Unexpected error during login process:", error);
+                 form.setError('root.unexpected', { type: 'manual', message: formatMessage('auth.login.feedback.error') || 'An unexpected error occurred.' });
+            }
+        },
+        // Update dependencies: Remove isKeycloakSetupError if defined outside. Add 'email'.
+        [form, login, email, navigate, formatMessage, startTransition]
+    );
 	const inputBackgroundColor = theme.palette.grey[100]; 
 
 	return (

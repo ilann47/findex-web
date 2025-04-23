@@ -7,7 +7,7 @@ import { usePagination } from '../pagination'
 import { useSorting } from '../sorting'
 import { ReturnType } from '@/schemas/pageable'
 import { Service } from '@/service'
-import { saadAPI } from '@/shared/saad'
+import { sarfAPI } from '@/shared/sarf'
 
 export interface GetParams {
 	endpoint: string
@@ -18,7 +18,7 @@ export interface GetParams {
 }
 
 export const useGetAll = <T extends ReturnType>({ endpoint, requestParams, enabled }: GetParams) => {
-	const service = new Service<T>(saadAPI, endpoint)
+	const service = new Service<T>(sarfAPI, endpoint)
 
 	const queryFn = useCallback(async () => {
 		const data = await service.get({

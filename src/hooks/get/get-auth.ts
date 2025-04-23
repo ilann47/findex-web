@@ -6,7 +6,7 @@ import { KEYCLOAK_ID_CLIENT, KEYCLOAK_REALM } from '@/constants/auth'
 import { ENDPOINTS } from '@/constants/endpoints'
 import { ReturnType } from '@/schemas/pageable'
 import { Service } from '@/service'
-import { saadAPI } from '@/shared/saad'
+import { sarfAPI } from '@/shared/sarf'
 import { getAuthLikeFilter } from '@/utils/auth'
 
 interface ParamsGetBy {
@@ -18,7 +18,7 @@ interface ParamsGetBy {
 }
 
 export const useAuthGetOne = <T extends object>({ endpoint, enabled, idParam }: ParamsGetBy) => {
-	const service = new Service<T>(saadAPI, `${ENDPOINTS.AUTH}/${endpoint}/id`)
+	const service = new Service<T>(sarfAPI, `${ENDPOINTS.AUTH}/${endpoint}/id`)
 
 	const { data, isLoading } = useQuery({
 		queryKey: [`${ENDPOINTS.AUTH}/${endpoint}`],

@@ -1,6 +1,6 @@
 import { contentTypeToFileExtensionMap } from '@/constants/file-extensions'
 import { RequestParams, Service } from '@/service'
-import { saadAPI } from '@/shared/saad'
+import { saadAPI } from '@/shared/sarf'
 
 export const downloadFile = (file: File) => {
 	const link = document.createElement('a')

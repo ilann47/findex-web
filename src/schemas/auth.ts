@@ -10,6 +10,21 @@ export const credentialsSchema = z.object({
 
 export type Credentials = z.output<typeof credentialsSchema>
 
+const SIX_DIGIT_CODE_REGEX = /^\d{6}$/;
+
+export const VerificationCodeSchema = z.object({
+  verificationCode: z.string()
+    .regex(SIX_DIGIT_CODE_REGEX, { message: 'auth.register.email.invalid-code'}),
+});
+
+export type VerificationCode = z.infer<typeof VerificationCodeSchema>;
+
+export const emailSchema = z.object({
+	email: z.string().email()
+})
+
+export type EmailSchema = z.output<typeof emailSchema>
+
 const roleNameSchema = z.enum(ROLES)
 
 export type RoleName = z.output<typeof roleNameSchema>

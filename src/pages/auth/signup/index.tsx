@@ -93,35 +93,25 @@ const RegisterPage = () => {
 
 
             try {
-                console.log('RegisterPage: Calling auth.register...');
-                // *** Envia o 'finalPayload' modificado para a função register do hook ***
                 await register(
-                    finalPayload, // <--- Passa o objeto com username preenchido
+                    finalPayload,
                     () => {
-                       console.log('RegisterPage: auth.register onError callback triggered.');
                      },
                     () => {
-                        console.log('RegisterPage: auth.register onSuccess callback triggered. Navigating...');
                         startTransition(() => {
                             navigate('/login');
                         });
                     }
                 );
-                console.log('RegisterPage: auth.register call finished.');
             } catch (error) {
-                 // Captura erros inesperados que podem ocorrer na chamada de register
-                 // (embora o try/catch dentro do useAuth já deva lidar com erros da API)
-                console.error("RegisterPage: Unexpected error during register call:", error);
                 form.setError('root.unexpected', {
                     type: 'unexpected',
                     message: formatMessage('form.unexpected'),
                 });
             }
         },
-        // Dependências do useCallback
         [form, register, navigate, formatMessage, startTransition]
      );
-    // --- Constants ---
     const inputBackgroundColor = theme.palette.grey[100];
 
     return (
@@ -289,7 +279,7 @@ const RegisterPage = () => {
 
                     {/* Link to Login Page */}
                     <Typography variant="body2" sx={{ mt: 3, textAlign: 'center' }}>
-                        {formatMessage('auth.register.noAccount')}
+                        {formatMessage('auth.register.noAccount')}{'  '}
                         <MuiLink
                             component={RouterLink}
                             to="/login"

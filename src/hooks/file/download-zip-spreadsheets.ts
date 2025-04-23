@@ -11,7 +11,7 @@ import { useLoading } from '../loading'
 import { ENDPOINTS } from '@/constants/endpoints'
 import { Instrument } from '@/schemas/instrument'
 import { Service } from '@/service'
-import { saadAPI } from '@/shared/saad'
+import { saadAPI } from '@/shared/sarf'
 import { DateObjectToDateString } from '@/utils/date'
 import { blobToFile, downloadFile, getFile, sanitizeFilename } from '@/utils/file'
 

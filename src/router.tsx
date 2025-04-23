@@ -9,6 +9,7 @@ import ForbiddenPage from './pages/error/forbidden'
 import NotFoundPage from './pages/error/not-found'
 import WelcomePage from './pages/welcome'
 import RegisterPage from './pages/auth/signup'
+import EmailPage from './pages/auth/email'
 
 const LoginPage = lazy(() => import('@/pages/auth/login'))
 const AuthenticationPage = lazy(() => import('@/pages/authentication'))
@@ -73,6 +74,10 @@ export const router = createBrowserRouter([
 			{
 				path: 'register',
 				element: <RegisterPage />,
+			},
+			{
+				path: 'email',
+				element: <EmailPage />,
 			},
 			{
 				path: 'unauthorized',

@@ -7,7 +7,7 @@ import { useLoading } from './loading'
 import { useToast } from './toast'
 import { ENDPOINTS } from '@/constants/endpoints'
 import { RequestParams, Service } from '@/service'
-import { saadAPI } from '@/shared/saad'
+import { saadAPI } from '@/shared/sarf'
 import { ErrorResponse } from '@/types/error-response'
 import { Message } from '@/types/i18n'
 
