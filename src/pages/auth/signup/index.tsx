@@ -28,7 +28,6 @@ const LEFT_DECORATION_PATH = '/src/assets/images/large-vertical-waves.svg';
 const RIGHT_DECORATION_PATH = '/src/assets/images/large-vertical-waves.svg';
 
 const RegisterPage = () => {
-    // --- Hooks ---
     const { register } = useAuth();
     const navigate = useNavigate();
     const formatMessage = useFormatMessage(); 
@@ -99,7 +98,8 @@ const RegisterPage = () => {
                      },
                     () => {
                         startTransition(() => {
-                            navigate('/login');
+                            const encodedEmail = encodeURIComponent(data.email);
+                            navigate(`/email?address=${encodedEmail}`);
                         });
                     }
                 );
@@ -125,7 +125,6 @@ const RegisterPage = () => {
             justifyContent='center'
             alignItems='center'
         >
-            {/* Decorative Images */}
             <Box
                 component="img"
                 src={LEFT_DECORATION_PATH}
@@ -141,12 +140,12 @@ const RegisterPage = () => {
             <Stack
                 component="main"
                 p={{ xs: 3, md: 5 }}
-                gap={3} // Spacing between elements in the main form container
+                gap={3} 
                 alignItems='center'
                 width={{ xs: '90%', sm: 450, md: 500 }}
                 bgcolor={theme.palette.juicy.neutral[10]}
                 borderRadius={2}
-                zIndex={1} // Ensure form is above background decorations
+                zIndex={1} 
             >
                 <Box
                     component="img"
@@ -158,17 +157,15 @@ const RegisterPage = () => {
                     }}
                 />
 
-                {/* Form Element */}
                 <Stack
                     component="form"
                     onSubmit={form.handleSubmit(
                         registerUser,
-                        // Função chamada SE a validação falhar
                         (errors) => {
                             console.error('!!! FORM VALIDATION FAILED !!!', errors);
                         }
                     )} width='100%'
-                    gap={2.5} // Spacing between form fields/groups
+                    gap={2.5} 
                     noValidate 
                 >
                     <Stack spacing={0.5}>
@@ -219,7 +216,6 @@ const RegisterPage = () => {
                         />
                     </Stack>
 
-                    {/* Confirm Password Field */}
                     <Stack spacing={0.5}>
                         <Typography variant="body2" fontWeight="medium" component="label" htmlFor="confirm-password-input">
                             {formatMessage('auth.user.confirmPass')}
@@ -252,17 +248,14 @@ const RegisterPage = () => {
 
 
 
-                     {/* Optional space before root errors/button */}
                      <Box sx={{ pt: 2 }} />
 
-                    {/* Display Root Errors (e.g., server errors) */}
                     {(form.formState.errors.root?.server || form.formState.errors.root?.unexpected) && (
                         <Typography color="error" variant="body2" sx={{ mb: 1 }}>
                             {form.formState.errors.root?.server?.message || form.formState.errors.root?.unexpected?.message}
                         </Typography>
                     )}
 
-                    {/* Register Button */}
                     <Button
                         type='submit'
                         variant='contained'
@@ -277,7 +270,6 @@ const RegisterPage = () => {
                             : (formatMessage('auth.register.button'))}
                     </Button>
 
-                    {/* Link to Login Page */}
                     <Typography variant="body2" sx={{ mt: 3, textAlign: 'center' }}>
                         {formatMessage('auth.register.noAccount')}{'  '}
                         <MuiLink
@@ -301,6 +293,8 @@ const RegisterPage = () => {
                      position: 'absolute', right: 150, top: 0, height: '100vh',
                      width: { md: '250px', lg: '350px' }, maxWidth: '30%',
                      objectFit: 'cover', zIndex: 0,
+                    transform: 'scaleX(-1)',
+
                  }}
             />
         </Stack>

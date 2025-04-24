@@ -1,290 +1,345 @@
-import { useCallback, useState, useTransition } from 'react';
-
+import React, { useCallback, useState, useTransition, useEffect } from 'react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
-	Button,
-	Stack,
-	Typography,
-	Link as MuiLink,
-	Box,
-	IconButton,
-	InputAdornment,
+    Button,
+    Stack,
+    Typography,
+    Link as MuiLink,
+    Box,
+    IconButton,
+    InputAdornment,
+    Alert, 
 } from '@mui/material';
 import { useForm } from 'react-hook-form';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import ControlledTextField from '@/components/ui/inputs/text-field';
 import { useAuth } from '@/hooks/auth';
 import { useFormatMessage } from '@/hooks/i18n/format-message';
-import { Credentials, Email } from '@/schemas/auth';
+import { Credentials, LoginSchema } from '@/schemas/auth'; 
 import { theme } from '@/theme';
-import { isAxiosError } from 'axios'; // Importar o type guard do Axios (recomendado)
+import { isAxiosError } from 'axios';
 
 const SARF_LOGO_PATH = '/src/assets/images/sarf_logotype_fonte_suave.svg';
 const LEFT_DECORATION_PATH = '/src/assets/images/large-vertical-waves.svg';
-const RIGHT_DECORATION_PATH = '/src/assets/images/large-vertical-waves.svg'; 
+const RIGHT_DECORATION_PATH = '/src/assets/images/large-vertical-waves.svg';
 
-declare const login: (
-    data: Credentials,
-    onFailure: (errorDetails?: any) => void, // Pode manter ou simplificar se não usar mais detalhes aqui
-    onSuccess: () => void
-) => Promise<void>;
+interface LocationState {
+    emailVerified?: boolean;
+    emailAddress?: string;
+}
 
 const LoginPage = () => {
-	const { login, email } = useAuth();
-	const navigate = useNavigate();
-	const formatMessage = useFormatMessage();
-	const [showPassword, setShowPassword] = useState(false);
-    const [isPending, startTransition] = useTransition(); 
+    const { login, email } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const formatMessage = useFormatMessage();
+    const [showPassword, setShowPassword] = useState(false);
+    const [isPending, startTransition] = useTransition();
+    const [loginError, setLoginError] = useState<string | null>(null); 
+    const [verificationMessage, setVerificationMessage] = useState<string | null>(null); 
 
-	const form = useForm<Credentials>({
-		defaultValues: { password: '', username: '' },
-	});
+    const passedState = location.state as LocationState | null;
 
-	const handleClickShowPassword = () => setShowPassword((show) => !show);
-	const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-		event.preventDefault();
-	};
+    const form = useForm<Credentials>({
+        resolver: zodResolver(LoginSchema), 
+        defaultValues: {
+            username: passedState?.emailAddress || '', 
+            password: '',
+        },
+        mode: 'onBlur', 
+    });
 
-	function isKeycloakSetupError(error: unknown): boolean {
+    useEffect(() => {
+        if (passedState?.emailVerified && passedState?.emailAddress) {
+            setVerificationMessage(
+                (formatMessage('auth.login.feedback.email-verified-success') + '{email}' || 'Email validated successfully for {email}. Please log in.')
+                    .replace('{email}', passedState.emailAddress)
+            );
+
+            navigate(location.pathname, { replace: true, state: {} });
+        }
+    }, [passedState, navigate, location.pathname, formatMessage]);
+
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
+    const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+    };
+
+    function isKeycloakSetupError(error: unknown): boolean {
         if (isAxiosError(error) && error.response?.data) {
             const errorData = error.response.data;
             return (
                 errorData.error === 'invalid_grant' &&
                 typeof errorData.error_description === 'string' &&
-                errorData.error_description.includes('Account is not fully set up')
+                errorData.error_description.includes('Account is not fully set up') 
             );
         }
         return false;
     }
 
-
-	const loginUser = useCallback(
-        // Remove 'emaildata' parameter
+    const loginUser = useCallback(
         async (data: Credentials) => {
             form.clearErrors();
+            setLoginError(null); 
+            setVerificationMessage(null); 
 
             try {
                 await login(
                     data,
-                    // onError callback for the main 'login' function
                     (errorDetails) => {
+                         console.log("Login onFailure triggered. Error details:", errorDetails);
                         if (isKeycloakSetupError(errorDetails)) {
+                            console.log("Keycloak setup error detected. Resending verification email for:", data.username);
                             email(
-                                { email: data.username }, 
-                                () => {
-                                },
-                                () => {
-                                }
+                                { email: data.username },
+                                () => { console.error("Resend verification email failed for:", data.username); }, 
+                                () => { console.log("Resend verification email request successful for:", data.username); }  
                             );
 
-                            // Navigate after initiating the email call
                             startTransition(() => {
-								const encodedEmail = encodeURIComponent(data.username);
+                                const encodedEmail = encodeURIComponent(data.username);
                                 navigate(`/email?address=${encodedEmail}`);
                             });
                         } else {
-                            // Handle other login errors (e.g., wrong credentials)
-                            console.log("Credentials error or other login issue detected, setting form errors");
-                            form.setError('username', {
-                                type: 'manual',
-                                message: formatMessage('auth.login.feedback.wrong-credentials') || 'Invalid credentials',
-                            });
-                            form.setError('password', {
-                                type: 'manual',
-                                message: formatMessage('auth.login.feedback.wrong-credentials') || 'Invalid credentials',
-                            });
+                            console.log("Credentials error or other login issue. Setting form errors.");
+                            const errorMessage = formatMessage('auth.login.feedback.wrong-credentials') || 'Invalid email or password.';
+                             form.setError('username', { type: 'manual' }); 
+                             form.setError('password', { type: 'manual' });
+                             setLoginError(errorMessage); 
                         }
                     },
-                    // onSuccess callback for the main 'login' function
                     () => {
+                        console.log("Login successful. Navigating to home.");
                         startTransition(() => {
-                            navigate('/');
+                            navigate('/'); 
                         });
                     }
                 );
             } catch (error) {
-                 // Catch unexpected errors during the process
-                 console.error("Unexpected error during login process:", error);
-                 form.setError('root.unexpected', { type: 'manual', message: formatMessage('auth.login.feedback.error') || 'An unexpected error occurred.' });
+                console.error("Unexpected error during login process:", error);
+                setLoginError(formatMessage('error.unexpected') || 'An unexpected error occurred. Please try again.');
             }
         },
-        // Update dependencies: Remove isKeycloakSetupError if defined outside. Add 'email'.
         [form, login, email, navigate, formatMessage, startTransition]
     );
-	const inputBackgroundColor = theme.palette.grey[100]; 
 
-	return (
-		<Stack
-			sx={{
-				backgroundColor: theme.palette.juicy.neutral[10], 
-				minHeight: '100vh',
-				position: 'relative', 
-				overflow: 'hidden',
-			}}
-			justifyContent='center' 
-			alignItems='center' 
-		>
-			<Box
-				component="img"
-				src={LEFT_DECORATION_PATH}
-				alt="" 
-				sx={{
-					display: { xs: 'none', md: 'block' },
-					position: 'absolute',
-					left: 150,
-					top: 0,
-					height: '100vh',
-					width: { md: '250px', lg: '350px' },
-					maxWidth: '30%',
-					objectFit: 'cover',
-					zIndex: 0,
-				}}
-			/>
+    const inputBackgroundColor = theme.palette.grey[100];
+    const combinedIsLoading = form.formState.isSubmitting || isPending; 
 
-			<Stack
-				component="main"
-				p={{ xs: 3, md: 5 }}
-				gap={3}
-				alignItems='center'
-				width={{
-					xs: '90%',
-					sm: 450,
-					md: 500,
-				}}
-				bgcolor={theme.palette.juicy.neutral[10]} 
-				borderRadius={2}
-				zIndex={1} // Ensure form is above images
-			>
-				{/* Logo */}
-				<Box
-					component="img"
-					src={SARF_LOGO_PATH}
-					alt="SARF Logo"
-					sx={{
-						width: { xs: '70%', sm: 300, md: 320 }, 
-						maxWidth: '320px', 
-						height: 'auto',
-						mb: 4, 
-					}}
-				/>
+    return (
+        <Stack
+            sx={{
+                backgroundColor: theme.palette.juicy.neutral[10],
+                minHeight: '100vh',
+                position: 'relative',
+                overflow: 'hidden',
+            }}
+            justifyContent='center'
+            alignItems='center'
+        >
+            <Box
+                component="img"
+                src={LEFT_DECORATION_PATH}
+                alt=""
+                sx={{
+                    display: { xs: 'none', md: 'block' },
+                    position: 'absolute',
+                    left: { md: 100, lg: 150 },
+                    top: 0,
+                    height: '100vh',
+                    width: { md: '200px', lg: '300px', xl: '350px' }, 
+                    maxWidth: '30%',
+                    objectFit: 'cover',
+                    zIndex: 0,
+                }}
+            />
 
-				<Stack
-					component="form"
-					onSubmit={form.handleSubmit(loginUser)}
-					width='100%'
-					gap={2.5}
-				>
-					<Stack spacing={0.5}>
-						<Typography variant="body2" fontWeight="medium" component="label" htmlFor="username-input">
-							{formatMessage('auth.user.email') || 'Email'}
-						</Typography>
-						<ControlledTextField
-							id="username-input"
-							variant="outlined"
-							placeholder={formatMessage('auth.user.email') || 'Enter your email'}
-							control={form.control}
-							name='username'
-							type='email'
-							clearable={false}
-							sx={{ 
-								'& .MuiOutlinedInput-root': {
-									backgroundColor: inputBackgroundColor,
-								},
-							}}
-						/>
-					</Stack>
+            <Stack
+                component="main"
+                p={{ xs: 3, sm: 4, md: 5 }} 
+                gap={3}
+                alignItems='center'
+                width={{
+                    xs: '90%',
+                    sm: 450,
+                    md: 500,
+                }}
+                bgcolor={theme.palette.background.paper}
+                borderRadius={2}
+                zIndex={1}
+            >
+                <Box
+                    component="img"
+                    src={SARF_LOGO_PATH}
+                    alt="SARF Logo"
+                    sx={{
+                        width: { xs: '60%', sm: 280, md: 300 }, 
+                        maxWidth: '300px',
+                        height: 'auto',
+                        mb: 3, 
+                    }}
+                />
 
-					<Stack spacing={0.5}>
-						<Typography variant="body2" fontWeight="medium" component="label" htmlFor="password-input">
-							{formatMessage('auth.user.password') || 'Password'}
-						</Typography>
-						<ControlledTextField
-							id="password-input"
-							variant="outlined"
-							placeholder={formatMessage('auth.user.password') || 'Enter your password'}
-							control={form.control}
-							name='password'
-							type={showPassword ? 'text' : 'password'}
-							clearable={false}
-							InputProps={{
-								endAdornment: (
-									<InputAdornment position="end">
-										<IconButton
-											aria-label="toggle password visibility"
-											onClick={handleClickShowPassword}
-											onMouseDown={handleMouseDownPassword}
-											edge="end"
-										>
-											{showPassword ? <VisibilityOff /> : <Visibility />}
-										</IconButton>
-									</InputAdornment>
-								),
-							}}
-							sx={{ 
-								'& .MuiOutlinedInput-root': {
-									backgroundColor: inputBackgroundColor,
-								},
-							}}
-						/>
-					</Stack>
+                <Typography variant="h5" component="h1" align="center" fontWeight="medium" gutterBottom>
+                    {formatMessage('auth.login.title') || 'Welcome Back!'} 
+                </Typography>
 
-					<MuiLink
-						component={RouterLink}
-						to="/forgot-password"
-						variant="body2"
-						underline="hover"
-						sx={{ alignSelf: 'flex-end', mt: 1, mb: 2 }}
-					>
-						{formatMessage('auth.login.forgotPassword') || 'Forgot password?'}
-					</MuiLink>
 
-					<Button
-						type='submit'
-						variant='contained'
-						color='primary'
-						fullWidth
-						size='large'
-						sx={{ py: 1.5, textTransform: 'none', fontSize: '1rem' }}
-						disabled={form.formState.isSubmitting}
-					>
-						{form.formState.isSubmitting || isPending 
-							? (formatMessage('auth.login.loading') || 'Logging in...')
-							: (formatMessage('auth.login.button') || 'Login')}
-					</Button>
+                {verificationMessage && (
+                    <Alert severity="success" sx={{ width: '100%', mb: 2 }}>
+                        {verificationMessage}
+                    </Alert>
+                )}
 
-					<Typography variant="body2" sx={{ mt: 3, textAlign: 'center' }}>
-						{formatMessage('auth.login.noAccount') || "Don't have an account?"}{' '}
-						<MuiLink
-							component={RouterLink}
-							to="/register"
-							underline="hover"
-							fontWeight="medium"
-						>
-							{formatMessage('auth.login.registerNow') || 'Register now'}
-						</MuiLink>
-					</Typography>
-				</Stack>
-			</Stack>
+                 {loginError && !form.formState.isSubmitting && ( 
+                    <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+                        {loginError}
+                    </Alert>
+                 )}
 
-			<Box
-				component="img"
-				src={RIGHT_DECORATION_PATH} 
-				alt="" 
-				sx={{
-					display: { xs: 'none', md: 'block' },
-					position: 'absolute',
-					right: 150, 
-					top: 0,
-					height: '100vh',
-					width: { md: '250px', lg: '350px' },
-					maxWidth: '30%',
-					objectFit: 'cover',
-					zIndex: 0,
-				}}
-			/>
-		</Stack>
-	);
+                {form.formState.errors.root?.unexpected && (
+                     <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+                        {form.formState.errors.root.unexpected.message}
+                    </Alert>
+                )}
+
+                <Stack
+                    component="form"
+                    onSubmit={form.handleSubmit(loginUser)}
+                    noValidate 
+                    width='100%'
+                    gap={2} 
+                >
+                    <Stack spacing={0.5}>
+                        <Typography variant="body2" fontWeight="medium" component="label" htmlFor="username-input">
+                            {formatMessage('auth.user.email') || 'Email'}
+                        </Typography>
+                        <ControlledTextField
+                            id="username-input"
+                            aria-label={formatMessage('auth.user.email') || 'Enter your email address'}
+                            variant="outlined"
+                            placeholder={formatMessage('auth.user.email') || 'your.email@example.com'}
+                            control={form.control}
+                            name='username' 
+                            type='email'
+                            autoComplete="email" 
+                            clearable={false}
+                            disabled={combinedIsLoading} 
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    backgroundColor: inputBackgroundColor,
+                                },
+                            }}
+                        />
+                    </Stack>
+
+                    <Stack spacing={0.5}>
+                        <Typography variant="body2" fontWeight="medium" component="label" htmlFor="password-input">
+                            {formatMessage('auth.user.password') || 'Password'}
+                        </Typography>
+                        <ControlledTextField
+                            id="password-input"
+                            variant="outlined"
+                            placeholder={formatMessage('auth.user.password')}
+                            control={form.control}
+                            name='password'
+                            type={showPassword ? 'text' : 'password'}
+                            autoComplete="current-password" 
+                            clearable={false}
+                            disabled={combinedIsLoading} 
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={handleClickShowPassword}
+                                            onMouseDown={handleMouseDownPassword}
+                                            edge="end"
+                                            disabled={combinedIsLoading} 
+                                        >
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    backgroundColor: inputBackgroundColor,
+                                },
+                            }}
+                        />
+                    </Stack>
+
+                    <MuiLink
+                        component={RouterLink}
+                        to="/forgot-password"
+                        variant="body2"
+                        underline="hover"
+                        tabIndex={combinedIsLoading ? -1 : 0} 
+                        sx={{
+                            alignSelf: 'flex-end',
+                            mt: 0.5,
+                            mb: 2,
+                            color: combinedIsLoading ? 'text.disabled' : 'primary.main',
+                            pointerEvents: combinedIsLoading ? 'none' : 'auto',
+                         }}
+                    >
+                        {formatMessage('auth.login.forgotPassword') || 'Forgot password?'}
+                    </MuiLink>
+
+                    <Button
+                        type='submit'
+                        variant='contained'
+                        color='primary'
+                        fullWidth
+                        size='large'
+                        sx={{ py: 1.5, textTransform: 'none', fontSize: '1rem', mt: 1 }} 
+                        disabled={combinedIsLoading} 
+                    >
+                        {combinedIsLoading
+                            ? (formatMessage('auth.login.loading') || 'Logging in...')
+                            : (formatMessage('auth.login.button') || 'Login')}
+                    </Button>
+
+                    <Typography variant="body2" sx={{ mt: 3, textAlign: 'center' }}>
+                        {formatMessage('auth.login.noAccount') || "Don't have an account?"}{' '}
+                        <MuiLink
+                            component={RouterLink}
+                            to="/register"
+                            underline="hover"
+                            fontWeight="medium"
+                            tabIndex={combinedIsLoading ? -1 : 0} 
+                             sx={{
+                                color: combinedIsLoading ? 'text.disabled' : 'primary.main',
+                                pointerEvents: combinedIsLoading ? 'none' : 'auto',
+                             }}
+                        >
+                            {formatMessage('auth.login.registerNow') || 'Register now'}
+                        </MuiLink>
+                    </Typography>
+                </Stack>
+            </Stack>
+
+            <Box
+                component="img"
+                src={RIGHT_DECORATION_PATH}
+                alt=""
+                sx={{
+                    display: { xs: 'none', md: 'block' },
+                    position: 'absolute',
+                    right: { md: 100, lg: 150 },
+                    top: 0,
+                    height: '100vh',
+                    width: { md: '200px', lg: '300px', xl: '350px' }, 
+                    maxWidth: '30%',
+                    objectFit: 'cover',
+                    zIndex: 0,
+                    transform: 'scaleX(-1)',
+                }}
+            />
+        </Stack>
+    );
 };
 
 export default LoginPage;

@@ -10,6 +10,9 @@ export const credentialsSchema = z.object({
 
 export type Credentials = z.output<typeof credentialsSchema>
 
+export const LoginSchema = credentialsSchema;
+export type Login = Credentials;
+
 const SIX_DIGIT_CODE_REGEX = /^\d{6}$/;
 
 export const VerificationCodeSchema = z.object({

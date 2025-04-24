@@ -139,7 +139,13 @@ const EmailPage = () => {
                                 },
                                 () => { 
                                     startTransition(() => {
-                                        navigate('/login');
+                                        navigate('/login', {
+                                            replace: true, 
+                                            state: {
+                                                emailVerified: true,
+                                                emailAddress: emailAddress 
+                                            }
+                                        });
                                     });
                                 }
                             );
@@ -162,7 +168,7 @@ const EmailPage = () => {
                  setIsLoading(false);
             }
         },
-        [form, verifyEmail, validateEmail, emailAddress, navigate, formatMessage, startTransition]
+        [form, verifyEmail, validateEmail, emailAddress, location.search, navigate, formatMessage, startTransition]
     );
 
     const inputBackgroundColor = theme.palette.grey[100];
@@ -234,7 +240,7 @@ const EmailPage = () => {
                         {formatMessage('auth.register.email.info-validate-email') || 'Verify Your Email'}
                     </Typography>
                      <Typography variant="body1" align='center' color="text.secondary" sx={{ mb: 2 }}>
-                        {(formatMessage('auth.register.email.info-validate-detail') || 'We sent a 6-digit code to {emailAddress}. Please enter it below.').replace('{emailAddress}', emailAddress)}
+                        {(formatMessage('auth.register.email.info-validate-detail') + '{emailAddress}'|| 'We sent a 6-digit code to {emailAddress}. Please enter it below.').replace('{emailAddress}', emailAddress)}
                     </Typography>
 
                     <Stack spacing={0.5}>
@@ -269,16 +275,6 @@ const EmailPage = () => {
                                  },
                             }}
                         />
-                        {form.formState.errors.root?.unexpected && (
-                            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-                                {form.formState.errors.root.unexpected.message}
-                            </Typography>
-                        )}
-                         {form.formState.errors.verificationCode && (
-                             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-                                 {form.formState.errors.verificationCode.message}
-                             </Typography>
-                         )}
                     </Stack>
 
                     <Typography variant="body2" sx={{ textAlign: 'right' }}>
@@ -302,7 +298,7 @@ const EmailPage = () => {
                             }}
                         >
                              {isResendCooldown
-                                ? (formatMessage('auth.register.email.resend-cooldown') || 'Resend code in {time}s').replace('{time}', String(cooldownTime))
+                                ? (formatMessage('auth.register.email.resend-cooldown') + '{time}' || 'Resend code in {time}s').replace('{time}', String(cooldownTime))
                                 : formatMessage('auth.register.email.resend-code') || 'Resend verification code'
                             }
                         </MuiLink>
@@ -353,6 +349,7 @@ const EmailPage = () => {
                     maxWidth: '30%',
                     objectFit: 'cover',
                     zIndex: 0,
+                    transform: 'scaleX(-1)',
                 }}
             />
         </Stack>

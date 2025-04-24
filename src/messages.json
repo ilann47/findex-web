@@ -558,12 +558,14 @@
 		},
 		"auth": {
 			"login": {
+				"title": "Bem-vindo",
 				"loading": "Acessando conta....",
 				"button": "Entrar", 
 				"noAccount": "Não possui conta?",
 				"registerNow": "Registrar-se",
 				"forgotPassword": "Esqueceu a senha?",
 				"feedback": {
+					"email-verified-success": "Por favor, faça login!. Email verificado com sucesso: ",
 					"success": "Autenticação realizada com sucesso!",
 					"wrong-credentials": "Usuário e/ou senha incorretos!",
 					"error": "Lamento, ocorreu um erro na requisição!"
