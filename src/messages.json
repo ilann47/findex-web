@@ -407,6 +407,9 @@
 			"description": " ",
 			"role-warning": "Caso não esteja conseguindo acessar nenhuma página além dessa, significa que o seu usuário está sem as permissões necessárias. Tente reiniciar a página. Se continuar, Contate o administrador do sistema."
 		},
+		"error": {
+			"unexpected": "Erro: Algo Inesperado aconteceu ao executar a tarefa!."
+		},
 		"table": {
 			"columns": "Colunas",
 			"rows-per-page": "Linhas por página",
@@ -557,19 +560,35 @@
 			"saturday": "Sábado"
 		},
 		"auth": {
+			"reset-password": {
+				"title": "Atualizar senha! ",
+				"new-password": "Nova senha",
+				"confirm-new-password": "Confirmar nova senha",
+				"loading": "Atualizando...",
+				"reset": "Continuar",
+				"feedback": {
+					"success": "Senha atualizada com sucesso!.",
+					"failure": "Erro ao tentar atualizar a senha!."
+				}
+
+			},
 			"login": {
 				"title": "Bem-vindo",
 				"loading": "Acessando conta....",
 				"button": "Entrar", 
 				"noAccount": "Não possui conta?",
 				"registerNow": "Registrar-se",
-				"forgotPassword": "Esqueceu a senha?",
+				"forgotPassword": {
+					"title": "Esqueceu a senha?",
+					"subtitle": "Entre com seu e-mail abaixo e iremos enviar um código de validação para seu e-mail para que você possa resetar sua senha!",
+					"button": "Continuar",
+					"loading": "Enviando..."
+				},
 				"feedback": {
 					"email-verified-success": "Por favor, faça login!. Email verificado com sucesso: ",
 					"success": "Autenticação realizada com sucesso!",
 					"wrong-credentials": "Usuário e/ou senha incorretos!",
 					"error": "Lamento, ocorreu um erro na requisição!"
-
 				}
 			},
 			"register": {
@@ -590,6 +609,8 @@
 				"noAccount": "Já possui conta?",
 				"loginNow": "Entrar",
 				"passwordTooShort": "Senha muito curta!",
+				"passwordComplexity": "Senha muito fraca, precisa conter caracteres especiais, numeros, letras maiúsculas e minúsculas.",
+				"passwordsDoNotMatch": "Senhas não coincidem!",
 				"invalid-email": "Email inválido!",
 				"feedback": {
 					"success": "Conta criada com sucesso!",

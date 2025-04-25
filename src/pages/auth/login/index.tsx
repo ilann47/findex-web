@@ -285,7 +285,7 @@ const LoginPage = () => {
                             pointerEvents: combinedIsLoading ? 'none' : 'auto',
                          }}
                     >
-                        {formatMessage('auth.login.forgotPassword') || 'Forgot password?'}
+                        {formatMessage('auth.login.forgotPassword.title') || 'Forgot password?'}
                     </MuiLink>
 
                     <Button

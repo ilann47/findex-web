@@ -1,14 +1,13 @@
-import { Credentials, EmailSchema, OpenID, VerificationCode } from '@/schemas/auth';
+import { Credentials, EmailSchema, OpenID, ResetPassword, VerificationCode } from '@/schemas/auth';
 import keycloakAPI from '@/shared/keycloak';
 
 import {
-    // UserDataPayloadSchema,
-    // UserDataPayload, // Inferred type from UserDataPayloadSchema
     CreateUserResponseSchema,
 	CreateUserRequestPayloadSchema,
 	CreateUserRequestPayload,
 } from '@/schemas/auth';
 import { sarfAPI, sarfAPIwithoutHeader } from '@/shared/sarf';
+import { AxiosError } from 'axios';
 
 
 
@@ -23,16 +22,13 @@ export class KeycloakService {
     }
 
 	private async getAccessToken(params: URLSearchParams): Promise<OpenID> {
-        // ... (implementation unchanged)
         const response = await keycloakAPI.post<OpenID>(`realms/${this.realm}/protocol/openid-connect/token`, params, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         });
-        console.log(response.data)
         return response.data;
     }
 
     async login(credentials: Credentials): Promise<OpenID> {
-        // ... (implementation unchanged)
         const params = new URLSearchParams({
             client_id: this.clientID,
             grant_type: 'password',
@@ -43,7 +39,6 @@ export class KeycloakService {
     }
 
     async refreshAccessToken(refreshToken: string): Promise<OpenID> {
-        // ... (implementation unchanged)
         const params = new URLSearchParams({
             client_id: this.clientID,
             grant_type: 'refresh_token',
@@ -52,7 +47,6 @@ export class KeycloakService {
         return this.getAccessToken(params);
     }
     async emailExists(emailData: EmailSchema): Promise<{ userId: string | undefined }> {
-        // ... (implementation unchanged)
         const endpoint = '/preauth/email';
 
         try {
@@ -81,7 +75,6 @@ export class KeycloakService {
         }
     }
     async createSendEmail(emailData: EmailSchema): Promise<{ userId: string | undefined }> {
-        // ... (implementation unchanged)
         const endpoint = '/preauth';
 
         try {
@@ -113,7 +106,6 @@ export class KeycloakService {
         }
     }
     async updateSendEmail(emailData: EmailSchema): Promise<{ userId: string | undefined }> {
-        // ... (implementation unchanged)
         const endpoint = '/preauth';
 
         try {
@@ -138,7 +130,6 @@ export class KeycloakService {
         }
     }
     async verifyEmail(verificationCode: VerificationCode): Promise<{ userId: string | undefined }> {
-        // ... (implementation unchanged)
         const endpoint = '/preauth/code';
 
         try {
@@ -161,11 +152,79 @@ export class KeycloakService {
         }
     }
 
-    // --- CORRECTED METHOD ---
-    async validateEmail(emailData: EmailSchema): Promise<{ userId: string | undefined }> {
-        const endpoint = '/keycloak/validate-email'; // Assuming '/keycloak' is the base path for the controller
+    async resetPassword(emailData: EmailSchema, resetPasswordData: ResetPassword): Promise<{ userId: string | undefined}> {
+        const endpointGetUserID = '/keycloak/user-id';
+        const endpointResetPassword = '/auth/user/password';
 
-        // The backend expects a request parameter named 'username', which should be the email string
+        const searchUserIDParams = {
+            username: emailData.email
+        };
+
+        let userId: string | undefined;
+
+        try {
+            const responseGetUserId = await sarfAPIwithoutHeader.get(
+                endpointGetUserID,
+                {
+                    params: searchUserIDParams
+                }
+            );
+
+            const responseDataGetUserID = responseGetUserId?.data;
+
+            if (typeof responseDataGetUserID === 'string' && responseDataGetUserID.trim() !== '') {
+                userId = responseDataGetUserID.trim();
+            } else {
+                throw new Error(`User not found for email: ${emailData.email}`);
+            }
+
+            const params = {
+                realm: this.realm,
+                idUser: userId 
+            };
+            const resetPasswordBody = {
+                params,
+                temporary: false, 
+                value: resetPasswordData.password 
+            };
+
+            const responseToken = await sarfAPI.get('/keycloak'); 
+
+            if (typeof responseToken.data !== 'string' || responseToken.data.trim().length === 0) {
+                 throw new Error('Failed to retrieve a valid access token.');
+            }
+            const accessToken = responseToken.data.trim();
+
+            await sarfAPIwithoutHeader.put(endpointResetPassword, resetPasswordBody, { 
+                 headers: {
+                     'Authorization': `Bearer ${accessToken}`, 
+                     'Content-Type': 'application/json'
+                 }
+            });
+                 return { userId: undefined };
+
+        } catch (error: any) {
+            console.error('Error during password reset process:', error);
+
+            if (error instanceof AxiosError) { 
+                 console.error('Axios error details:', {
+                    message: error.message,
+                    code: error.code,
+                    status: error.response?.status,
+                    data: error.response?.data,
+                });
+                 throw new Error(`Password reset failed: ${error.response?.data?.message || error.message}`);
+            } else if (error.message.startsWith('User not found')) {
+                 throw error;
+            }
+            else {
+                throw new Error(`Password reset failed: ${error.message || 'Unknown error'}`);
+            }
+        }
+    }
+    async validateEmail(emailData: EmailSchema): Promise<{ userId: string | undefined }> {
+        const endpoint = '/keycloak/validate-email'; 
+
         const params = {
             username: emailData.email
         };
@@ -173,21 +232,16 @@ export class KeycloakService {
         try {
             console.log(`Sending PUT request to ${endpoint} with URL parameters:`, params);
 
-            // For PUT with URL params: put(url, data, config)
-            // data is the request body (null or {} if none needed)
-            // config contains the 'params' object for URL parameters
             const response = await sarfAPIwithoutHeader.put(
                 endpoint,
-                null, // No request body needed for this endpoint
+                null,
                 {
-                    params: params // This will append ?username=... to the URL
+                    params: params 
                 }
             );
 
             console.log(`Response from PUT ${endpoint}:`, response.data);
 
-            // The backend returns a String, which might be the userId or a confirmation message.
-            // Let's assume it might be the userId if it's a non-empty string.
             const responseData = response?.data;
             const potentialUserId = (typeof responseData === 'string' && responseData.trim() !== '') ? responseData.trim() : undefined;
 
@@ -204,14 +258,11 @@ export class KeycloakService {
              } else {
                 console.error('Error Message:', error.message);
              }
-             // Re-throw the error so the caller can handle it
              throw error;
         }
     }
-    // --- END OF CORRECTION ---
 
     async createUser(createData: CreateUserRequestPayload): Promise<{ userId: string | undefined }> {
-        // ... (implementation likely correct, but review based on backend endpoint)
         const validationResult = CreateUserRequestPayloadSchema.safeParse(createData);
         if (!validationResult.success) {
             console.error("Invalid user creation data:", validationResult.error.errors);
@@ -224,7 +275,7 @@ export class KeycloakService {
         };
 
 		try {
-            const responseToken = await sarfAPI.get('/keycloak'); // Is this the right endpoint to get the token?
+            const responseToken = await sarfAPI.get('/keycloak'); 
 
             if (typeof responseToken.data !== 'string' || responseToken.data.trim().length === 0) {
                  console.error('Expected a non-empty string token, but received:', responseToken.data);
@@ -232,9 +283,9 @@ export class KeycloakService {
             }
             const accessToken = responseToken.data.trim();
 
-            const response = await sarfAPIwithoutHeader.post('/auth/user', requestBody, { // Is '/auth/user' the correct endpoint?
+            const response = await sarfAPIwithoutHeader.post('/auth/user', requestBody, { 
                  headers: {
-                     'Authorization': `Bearer ${accessToken}`, // Corrected template literal
+                     'Authorization': `Bearer ${accessToken}`, 
                      'Content-Type': 'application/json'
                  }
             });
@@ -243,12 +294,10 @@ export class KeycloakService {
             if (!responseValidation.success) {
                  console.warn("User created, but API response structure is unexpected.", response.data);
                  console.error("Response validation errors:", responseValidation.error.errors);
-                 // Decide if you want to return undefined or throw an error on unexpected response
                  return { userId: undefined };
             }
 
             const validatedResponseData = responseValidation.data;
-            // Ensure the schema or logic correctly identifies the ID field (id vs userId)
             const newUserId = validatedResponseData.id ?? validatedResponseData.userId;
 
             if (newUserId) {
@@ -260,14 +309,13 @@ export class KeycloakService {
             }
 
         } catch (error: any) {
-            // Log specific details if available
             const errorDetails = error.response?.data || error.message || error;
             console.error(`Error creating user ${validatedData.username}:`, errorDetails);
             if (error.response) {
                 console.error('Status:', error.response.status);
                 console.error('Headers:', error.response.headers);
             }
-            throw error; // Re-throw after logging
+            throw error;
         }
     }
 }

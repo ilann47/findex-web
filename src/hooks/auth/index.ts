@@ -9,13 +9,12 @@ import { useAuthGetOne } from '../get/get-auth'
 import { useToast } from '../toast'
 import { ENDPOINTS } from '@/constants/endpoints'
 import { accessTokenAtom, refreshTokenAtom, tabFocusedTimeAtom, userAtom } from '@/contexts/atoms/auth'
-import { Credentials, RoleName, User, CreateUserRequestPayload, EmailSchema, VerificationCode } from '@/schemas/auth'
+import { Credentials, RoleName, User, CreateUserRequestPayload, EmailSchema, VerificationCode, ResetPassword } from '@/schemas/auth'
 import { KeycloakService } from '@/service/keycloak'
 import { sarfAPI } from '@/shared/sarf'
 import { addRequestHeaderFields } from '@/utils/add-request-header-fields'
 import { getExpirationTime } from '@/utils/auth'
 import { isAxiosError } from 'axios';
-import { Email } from '@carbon/icons-react'
 
 const keycloakService = new KeycloakService()
 
@@ -213,7 +212,34 @@ export const useAuth = () => {
 		},
 		[keycloakService, queryClient, notifyError ]
 	);
+	const resetPassword = useCallback(
+        async (
+            email: EmailSchema,
+            resetPasswordData: ResetPassword, 
+            onError: (error: unknown) => void,
+            onSuccess: (resetSuccessful: boolean) => void
+        ) => {
+            try {
+                await keycloakService.resetPassword(email, resetPasswordData);
 
+                try {
+                     await queryClient.invalidateQueries(); 
+                } catch (invalidationError) {
+                     console.error("Error during query invalidation:", invalidationError);
+                     onError(new Error("Query invalidation failed after password reset."));
+                     return; 
+                }
+
+
+                onSuccess(true);
+
+            } catch (error: any) {
+                    notifyError('auth.register.feedback.error');
+                    onError(error);
+            }
+        },
+        [keycloakService, queryClient, notifyError] 
+    );
 	const verifyEmail = useCallback(
         async (
             verificationCode: VerificationCode,
@@ -267,6 +293,7 @@ export const useAuth = () => {
 		email,
 		verifyEmail,
 		validateEmail,
+		resetPassword,
 		register,
 		userHasRole,
 		refreshSession,
