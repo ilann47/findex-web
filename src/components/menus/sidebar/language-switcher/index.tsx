@@ -14,9 +14,9 @@ const LanguageSwitcher: React.FC<Props> = ({ color = 'white' }) => {
 
 	const formatMessage = useFormatMessage()
 
-	const changeLanguage = () => {
-		if (locale == 'pt') changeLocale('es')
-		else changeLocale('pt')
+	const changeLanguage = (event: any) => {
+		const newLocale = event.target.value;
+		changeLocale(newLocale);
 	}
 
 	return (

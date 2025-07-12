@@ -1,7 +1,6 @@
-import { ChartArea, IbmCloudAppId, Settings, Temperature, WarningSquare } from '@carbon/icons-react'
+import { Location } from '@carbon/icons-react'
 import { Stack, ToggleButton } from '@mui/material'
 import { useAtomValue } from 'jotai'
-import { useIntl } from 'react-intl'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import LanguageSwitcher from './language-switcher'
@@ -18,7 +17,6 @@ export const Sidebar = () => {
 	const isCollapsed = useAtomValue(isSidebarCollapsedAtom)
 	const { locale } = useLocale()
 
-	const { formatMessage } = useIntl()
 	const { pathname } = useLocation()
 	const navigate = useNavigate()
 
@@ -39,20 +37,14 @@ export const Sidebar = () => {
 				value={pathname.split('/')[1]}
 				onChange={handleChange}
 			>
-			
 
-			
-
-			
-
-				<ProtectedComponent role={['AUTH_GROUP_LIST', 'AUTH_USER_LIST']}>
-					<ToggleButton value='auth'>
-						<IbmCloudAppId />
-						{!isCollapsed && formatMessage({ id: 'auth.title' })}
+				{/* Viagens */}
+				<ProtectedComponent role={['TRAVEL_LIST', 'TRAVEL_CREATE']}>
+					<ToggleButton value='travels'>
+						<Location />
+						{!isCollapsed && 'Viagens'}
 					</ToggleButton>
 				</ProtectedComponent>
-
-			
 			</StyledToggleButtonGroup>
 
 			<Stack alignItems='center' gap={8} mb={3} width='100%'>

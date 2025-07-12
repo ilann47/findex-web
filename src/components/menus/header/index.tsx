@@ -5,7 +5,7 @@ import { Stack } from '@mui/material'
 import { useAtom } from 'jotai'
 
 import { HeaderContainer } from './style'
-import Logotype from '@/assets/images/sarf_logotype_fonte_suave.svg?react'
+import Logotype from '@/assets/images/payTravel_logotype.svg?react'
 import { IconButton } from '@/components/ui/inputs/icon-button'
 import { UserAvatar } from '@/components/user/avatar'
 import { isSidebarCollapsedAtom } from '@/contexts/atoms/sidebar'

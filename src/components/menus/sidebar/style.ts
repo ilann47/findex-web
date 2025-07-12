@@ -16,15 +16,18 @@ export const SidebarContainer = styled(Stack)<SidebarContainerProps>(({ theme, i
 	top: 0,
 	bottom: 0,
 	left: 0,
+	zIndex: 10,
 	flexDirection: 'column',
 	justifyContent: 'space-between',
 	alignItems: 'center',
+	pointerEvents: 'auto',
 }))
 
 export const StyledToggleButtonGroup = styled(ToggleButtonGroup)<ToggleButtonGroupProps>(({ theme }) => ({
 	marginTop: HEADER_HEIGHT,
 	paddingTop: theme.spacing(3),
 	display: 'flex',
+	pointerEvents: 'auto',
 
 	'& svg': {
 		fill: theme.palette.juicy.neutral[50],
@@ -34,7 +37,10 @@ export const StyledToggleButtonGroup = styled(ToggleButtonGroup)<ToggleButtonGro
 	[`& .${toggleButtonClasses.root}`]: {
 		color: theme.palette.juicy.neutral[50],
 		fontWeight: 300,
+		pointerEvents: 'auto',
+		cursor: 'pointer',
 	},
+
 	'& .MuiButtonBase-root.Mui-selected': {
 		color: theme.palette.juicy.primary[50],
 		background: theme.palette.juicy.neutral[80],

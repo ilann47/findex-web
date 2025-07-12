@@ -1,43 +1,39 @@
+// Arquivo: src/App.tsx (VERSÃO CORRIGIDA E SIMPLIFICADA)
+
 import { CssBaseline } from '@mui/material';
 import { flatten } from 'flat';
 import { IntlProvider } from 'react-intl';
-import 'leaflet/dist/leaflet.css'; 
+import 'leaflet/dist/leaflet.css';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import BackdropLoading from './components/ui/feedback/loading/backdrop';
-import { useAlarmColors } from './hooks/alarm-colors';
-import { useI18n } from './hooks/i18n';
-import { useLoading } from './hooks/loading';
+import { router } from './router';
+import messagesData from './messages.json';
 import { useLocale } from './hooks/locale';
-import { router } from './router'; 
-import { AuthProvider } from './provider/auth';
 
 function App() {
-	const { locale } = useLocale();
-	const messages = useI18n(); 
-	const { isLoading } = useLoading(); 
+  // Usa o hook de locale para obter o idioma atual
+  const { locale } = useLocale();
+  
+  // Carrega as mensagens do arquivo JSON baseado no locale atual
+  const messages = messagesData;
+  const currentMessages = messages[locale] || messages.pt; // fallback para português
+  
+  // Converte locale para formato do IntlProvider
+  const intlLocale = locale === 'es' ? 'es-ES' : 'pt-BR';
 
-	useAlarmColors();
+  return (
+    // Carrega as mensagens baseadas no locale atual
+    <IntlProvider locale={intlLocale} messages={flatten(currentMessages)}>
+      <CssBaseline />
 
-	if (!messages || !messages[locale]) {
-		return <BackdropLoading />; 
-	}
+      <ToastContainer autoClose={5000} position='bottom-left' />
 
-	return (
-		<IntlProvider locale={locale} messages={flatten(messages[locale])}>
-			<AuthProvider>
-				<CssBaseline />
-
-				<ToastContainer autoClose={5000} position='bottom-left' />
-
-				{isLoading && <BackdropLoading />}
-
-				<RouterProvider router={router} />
-			</AuthProvider>
-		</IntlProvider>
-	);
+      {/* A responsabilidade principal do App agora é renderizar o roteador. */}
+      <RouterProvider router={router} />
+    </IntlProvider>
+  );
 }
 
 export default App;

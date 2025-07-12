@@ -11,5 +11,6 @@ export const ViewContainer = styled(Stack)<ViewContainerProps>(({ iscollapsed, t
 	marginLeft: iscollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH,
 	padding: theme.spacing(3),
 	gap: theme.spacing(3),
-	width: '100%',
+	minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
+	width: `calc(100% - ${iscollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH}px)`,
 }))
