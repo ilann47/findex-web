@@ -1,0 +1,13 @@
+// IDs dos grupos do Azure AD
+export const AZURE_GROUPS = {
+  GRUPO_GERAL: import.meta.env.VITE_AZURE_GROUP_GERAL,
+  GRUPO_TRAVELS: import.meta.env.VITE_AZURE_GROUP_GERAL,
+} as const;
+
+export const ROLE_GROUP_MAPPING: Record<string, string> = {
+  
+  'TRAVEL_LIST': AZURE_GROUPS.GRUPO_TRAVELS,
+  'TRAVEL_CREATE': AZURE_GROUPS.GRUPO_TRAVELS,
+  'TRAVEL_UPDATE': AZURE_GROUPS.GRUPO_TRAVELS,
+  'TRAVEL_DELETE': AZURE_GROUPS.GRUPO_TRAVELS,
+} as const;
