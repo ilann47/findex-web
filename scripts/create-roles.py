@@ -3,7 +3,7 @@ import requests
 keycloak_base_url = "https://keycloak-gedt.itaipuparquetec.org.br/"
 realm = "itaipu-siri"
 idClient = "e41d70ef-7ec5-46ee-a1a4-0962fc84046f"
-clientId = "saad-app"
+clientId = "gedv-app"
 username = "admin"
 password = "admin"
 

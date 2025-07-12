@@ -14,10 +14,10 @@ server {
     try_files $uri /index.html;
   }
 
-  location /saad-api/ {
+  location /gedv-api/ {
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
-    proxy_pass ${SAAD_API_URL};
+    proxy_pass ${GEDV_API_URL};
   }
 
   location /keycloak/ {

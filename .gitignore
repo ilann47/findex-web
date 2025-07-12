@@ -23,3 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 docker-compose.yml
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.homologation
+.env.production
+.env.*.local

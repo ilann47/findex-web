@@ -1,5 +1,5 @@
 {
-	"name": "saad-web",
+	"name": "gedv-web",
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
@@ -26,6 +26,8 @@
 		]
 	},
 	"dependencies": {
+		"@azure/msal-browser": "^4.15.0",
+		"@azure/msal-react": "^3.0.15",
 		"@carbon/icons-react": "^11.52.0",
 		"@dnd-kit/core": "^6.1.0",
 		"@dnd-kit/modifiers": "^7.0.0",
@@ -73,7 +75,7 @@
 	},
 	"devDependencies": {
 		"@types/lodash.debounce": "^4.0.9",
-		"@types/node": "^20.12.7",
+		"@types/node": "^20.19.7",
 		"@types/qs": "^6.9.16",
 		"@types/react": "^18.2.66",
 		"@types/react-dom": "^18.2.22",
