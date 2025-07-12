@@ -1,6 +1,6 @@
 import { contentTypeToFileExtensionMap } from '@/constants/file-extensions'
 import { RequestParams, Service } from '@/service'
-import { sarfAPI } from '@/shared/sarf'
+import { gedvAPI } from '@/shared/gedv'
 
 export const downloadFile = (file: File) => {
 	const link = document.createElement('a')
@@ -17,7 +17,7 @@ export const downloadFile = (file: File) => {
 export const blobToFile = (blob: Blob, fileName: string) => new File([blob], fileName, { type: blob.type })
 
 export const getFile = async (endpoint: string, filename: string, params?: RequestParams) => {
-	const service = new Service(sarfAPI, endpoint)
+	const service = new Service(gedvAPI, endpoint)
 
 	const { data: blob, headers } = await service.getFile('blob', params)
 	const contentType = headers['content-type']

@@ -7,7 +7,7 @@ import { useLoading } from './loading'
 import { useToast } from './toast'
 import { ENDPOINTS } from '@/constants/endpoints'
 import { RequestParams, Service } from '@/service'
-import { saadAPI } from '@/shared/sarf'
+import { gedvAPI } from '@/shared/gedv'
 import { ErrorResponse } from '@/types/error-response'
 import { Message } from '@/types/i18n'
 
@@ -49,7 +49,7 @@ export const useMutate = <T extends object, P extends object = object>({
 	endpoint,
 	invalidateQueries = [],
 }: Params) => {
-	const service = new Service<T>(saadAPI, endpoint)
+	const service = new Service<T>(gedvAPI, endpoint)
 	const queryClient = useQueryClient()
 	const { notifySuccess, notifyError } = useToast()
 	const { startLoading, stopLoading } = useLoading()

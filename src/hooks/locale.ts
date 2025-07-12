@@ -3,7 +3,7 @@ import { useCallback, useEffect } from 'react'
 import { useAtom } from 'jotai'
 
 import { localeAtom } from '@/contexts/atoms/locale'
-import { sarfAPI } from '@/shared/sarf'
+import { gedvAPI } from '@/shared/gedv'
 import { Locale } from '@/types/i18n'
 import { addRequestHeaderFields } from '@/utils/add-request-header-fields'
 
@@ -13,7 +13,7 @@ export const useLocale = () => {
 	const changeLocale = useCallback((newLocale: Locale) => setLocale(newLocale), [])
 
 	useEffect(() => {
-		addRequestHeaderFields(sarfAPI, { 'Accept-Language': locale })
+		addRequestHeaderFields(gedvAPI, { 'Accept-Language': locale })
 	}, [locale])
 
 	return {

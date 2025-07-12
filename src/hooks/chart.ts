@@ -38,7 +38,7 @@ export const useChart = () => {
 
 	Highcharts.setOptions({
 		time: {
-			useUTC: false,
+			// useUTC não existe no tipo TimeOptions, removendo para corrigir erro TypeScript
 		},
 		lang: {
 			months: [

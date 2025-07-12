@@ -4,7 +4,7 @@
 interface ImportMetaEnv {
 	readonly VITE_BASE_URL: string
 	readonly VITE_APP_VERSION: string
-	readonly VITE_SARF_API_URL: string
+	readonly VITE_GEDV_API_URL: string
 
 	readonly VITE_KEYCLOAK_URL: string
 	readonly VITE_KEYCLOAK_REALM: string

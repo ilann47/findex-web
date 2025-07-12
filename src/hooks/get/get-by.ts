@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { Service } from '@/service'
-import { sarfAPI } from '@/shared/sarf'
+import { gedvAPI } from '@/shared/gedv'
 
 interface ParamsGetBy {
 	endpoint: string
@@ -10,7 +10,7 @@ interface ParamsGetBy {
 }
 
 export const useGetBy = <T extends object>({ endpoint, id, enabled }: ParamsGetBy) => {
-	const service = new Service<T>(sarfAPI, endpoint)
+	const service = new Service<T>(gedvAPI, endpoint)
 
 	const { data, isLoading } = useQuery({
 		queryKey: [endpoint, Number(id)],
