@@ -1,0 +1,9 @@
+<svg width="360" height="100" viewBox="0 0 360 100" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <g transform="translate(10, 10)">
+    <path d="M40 0C25 0 12 13 12 28c0 18 28 48 28 48s28-30 28-48C68 13 55 0 40 0Zm0 38a10 10 0 1 1 0-20 10 10 0 0 1 0 20Z" fill="#1565C0"/>
+  </g>
+
+  <text x="100" y="65" font-family="Poppins, Segoe UI, sans-serif" font-size="60" font-weight="600" fill="#999">
+    pay<tspan fill="#1565C0">Travel</tspan>
+  </text>
+</svg>
