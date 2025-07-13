@@ -1,13 +1,13 @@
 export enum TravelStatus {
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED'
+  ATIVO = 'ATIVO',
+  INATIVO = 'INATIVO',
+  CANCELADO = 'CANCELADO',
+  CONCLUIDO = 'CONCLUIDO'
 }
 
 export interface TravelDTO {
   travelId?: number;
+  id?: number; // Possível campo alternativo da API
   userId: string;
   origin: string;
   destination: string;
@@ -20,10 +20,11 @@ export interface TravelDTO {
 }
 
 export interface CreateTravelRequest {
-  userId: string;
+  userId?: string;
   origin: string;
   destination: string;
   startDate: string;
   endDate: string;
   purpose: string;
+  status?: TravelStatus;
 }

@@ -8,6 +8,12 @@ export const gedvAPI = axios.create({
 	baseURL: import.meta.env.VITE_GEDV_API_URL,
 });
 
+// Log da configuração para debug
+console.log('🔧 Configuração da API GEDV:', {
+	baseURL: import.meta.env.VITE_GEDV_API_URL,
+	env: import.meta.env.MODE
+});
+
 gedvAPI.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
         const account = msalInstance.getActiveAccount();

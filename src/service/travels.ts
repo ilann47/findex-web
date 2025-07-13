@@ -1,103 +1,94 @@
-import { TravelDTO, CreateTravelRequest } from '@/types/travel';
-import { ENDPOINTS } from '@/constants/endpoints';
-import { createAuthHeaders } from '@/utils/auth-headers';
+import { TravelDTO, CreateTravelRequest, TravelStatus } from '@/types/travel';
+import { gedvAPI } from '@/shared/gedv';
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || '/api'}/${ENDPOINTS.TRAVELS}`;
-
-export const travelService = {
-  async getAllTravels(): Promise<TravelDTO[]> {
+class TravelService {
+  async getAllTravels(status?: string): Promise<TravelDTO[]> {
     try {
-      const headers = await createAuthHeaders();
+      let endpoint = '/travels/azure';
       
-      const response = await fetch(API_BASE_URL, {
-        method: 'GET',
-        headers,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      // Add status filter if provided
+      if (status) {
+        endpoint += `?status=${encodeURIComponent(status)}`;
       }
-
-      const data = await response.json();
-      return data;
+      
+      const response = await gedvAPI.get(endpoint);
+      const data = response.data;
+      return Array.isArray(data) ? data : [];
     } catch (error) {
-      throw error;
+      console.error('❌ Erro ao buscar viagens:', error);
+      return [];
     }
-  },
+  }
 
-  async createTravel(travelData: CreateTravelRequest): Promise<TravelDTO> {
+  // Get active travels (ativo and not expired)
+  async getActiveTravels(): Promise<TravelDTO[]> {
     try {
-      const headers = await createAuthHeaders();
+      const response = await gedvAPI.get('/travels/azure?status=ATIVO');
+      const travels = response.data;
       
-      const response = await fetch(API_BASE_URL, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(travelData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  async updateTravel(travelId: number, travelData: Partial<TravelDTO>): Promise<TravelDTO> {
-    try {
-      const headers = await createAuthHeaders();
+      // Filter out expired travels on client side
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
       
-      const response = await fetch(`${API_BASE_URL}/${travelId}`, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify(travelData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
+      const activeTravels = travels.filter((travel: TravelDTO) => travel.endDate >= today);
+      return Array.isArray(activeTravels) ? activeTravels : [];
     } catch (error) {
-      throw error;
+      console.error('❌ Erro ao buscar viagens ativas:', error);
+      return [];
     }
-  },
-
-  async deleteTravel(travelId: number): Promise<void> {
-    try {
-      const headers = await createAuthHeaders();
-      
-      const response = await fetch(`${API_BASE_URL}/${travelId}`, {
-        method: 'DELETE',
-        headers,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-    } catch (error) {
-      throw error;
-    }
-  },
+  }
 
   async getTravelById(travelId: number): Promise<TravelDTO> {
     try {
-      const headers = await createAuthHeaders();
-      
-      const response = await fetch(`${API_BASE_URL}/${travelId}`, {
-        method: 'GET',
-        headers,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
+      const response = await gedvAPI.get(`/travels/${travelId}`);
+      return response.data;
     } catch (error) {
+      console.error('❌ Erro ao buscar viagem:', error);
       throw error;
     }
-  },
-};
+  }
+
+  async createTravel(travelData: CreateTravelRequest): Promise<TravelDTO> {
+    try {
+      console.log('🔄 Tentando criar viagem via API...', travelData);
+      const response = await gedvAPI.post('/travels', travelData);
+      console.log('✅ Resposta da API:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Erro detalhado ao criar viagem:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          baseURL: error.config?.baseURL,
+          headers: error.config?.headers
+        }
+      });
+      throw error;
+    }
+  }
+
+  async updateTravel(travelId: number, travelData: Partial<TravelDTO>): Promise<TravelDTO> {
+    try {
+      const response = await gedvAPI.put(`/travels/${travelId}`, travelData);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erro ao atualizar viagem:', error);
+      throw error;
+    }
+  }
+
+  async deleteTravel(travelId: number): Promise<void> {
+    try {
+      await gedvAPI.delete(`/travels/${travelId}`);
+    } catch (error) {
+      console.error('❌ Erro ao deletar viagem:', error);
+      throw error;
+    }
+  }
+}
+
+export const travelService = new TravelService();

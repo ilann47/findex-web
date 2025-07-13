@@ -24,14 +24,14 @@ class ExpenseService {
     try {
       const formData = new FormData();
       
-      // Append basic expense data
-      Object.keys(expenseData).forEach(key => {
-        if (key !== 'attachments') {
-          formData.append(key, (expenseData as any)[key]);
+      // Add text fields
+      Object.entries(expenseData).forEach(([key, value]) => {
+        if (key !== 'attachments' && value !== undefined) {
+          formData.append(key, value.toString());
         }
       });
 
-      // Append files if any
+      // Add attachments if they exist
       if (expenseData.attachments) {
         expenseData.attachments.forEach((file, index) => {
           formData.append(`attachments[${index}]`, file);
@@ -65,7 +65,7 @@ class ExpenseService {
     try {
       await gedvAPI.delete(`/expenses/${expenseId}`);
     } catch (error) {
-      console.error('❌ Erro ao excluir despesa:', error);
+      console.error('❌ Erro ao deletar despesa:', error);
       throw error;
     }
   }
@@ -107,25 +107,17 @@ class ExpenseService {
       const response = await gedvAPI.get(`/travels/${travelId}/mileage-reimbursements`);
       return response.data;
     } catch (error) {
-      console.error('❌ Erro ao buscar reembolsos por km:', error);
+      console.error('❌ Erro ao buscar reembolsos por quilometragem:', error);
       throw error;
     }
   }
 
   async createMileageReimbursement(reimbursementData: CreateMileageReimbursementRequest): Promise<MileageReimbursementDTO> {
     try {
-      // Calculate total amount
-      const totalAmount = reimbursementData.distance * reimbursementData.ratePerKm;
-      
-      const response = await gedvAPI.post('/mileage-reimbursements', {
-        ...reimbursementData,
-        totalAmount,
-        type: 'MILEAGE'
-      });
-      
+      const response = await gedvAPI.post('/mileage-reimbursements', reimbursementData);
       return response.data;
     } catch (error) {
-      console.error('❌ Erro ao criar reembolso por km:', error);
+      console.error('❌ Erro ao criar reembolso por quilometragem:', error);
       throw error;
     }
   }
@@ -135,7 +127,7 @@ class ExpenseService {
       const response = await gedvAPI.put(`/mileage-reimbursements/${reimbursementId}`, reimbursementData);
       return response.data;
     } catch (error) {
-      console.error('❌ Erro ao atualizar reembolso por km:', error);
+      console.error('❌ Erro ao atualizar reembolso por quilometragem:', error);
       throw error;
     }
   }
@@ -144,23 +136,7 @@ class ExpenseService {
     try {
       await gedvAPI.delete(`/mileage-reimbursements/${reimbursementId}`);
     } catch (error) {
-      console.error('❌ Erro ao excluir reembolso por km:', error);
-      throw error;
-    }
-  }
-
-  // Utility methods
-  async getTravelSummary(travelId: number): Promise<{
-    totalExpenses: number;
-    totalAdvances: number;
-    totalReimbursements: number;
-    balance: number;
-  }> {
-    try {
-      const response = await gedvAPI.get(`/travels/${travelId}/summary`);
-      return response.data;
-    } catch (error) {
-      console.error('❌ Erro ao buscar resumo da viagem:', error);
+      console.error('❌ Erro ao deletar reembolso por quilometragem:', error);
       throw error;
     }
   }
