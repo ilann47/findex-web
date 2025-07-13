@@ -1,15 +1,16 @@
 import { useCallback } from 'react'
 
 import { ChevronLeft, ChevronRight } from '@carbon/icons-react'
-import { Stack } from '@mui/material'
+import { Stack, Box } from '@mui/material'
 import { useAtom } from 'jotai'
 
 import { HeaderContainer } from './style'
-import Logotype from '@/assets/images/payTravel_logotype.svg?react'
-import { IconButton } from '@/components/ui/inputs/icon-button'
-import { UserAvatar } from '@/components/user/avatar'
-import { isSidebarCollapsedAtom } from '@/contexts/atoms/sidebar'
-import { theme } from '@/theme'
+import { HeaderTabs } from './tabs'
+import Logotype from '../../../assets/images/payTravel_logotype.svg?react'
+import { IconButton } from '../../ui/inputs/icon-button'
+import { UserAvatar } from '../../user/avatar'
+import { isSidebarCollapsedAtom } from '../../../contexts/atoms/sidebar'
+import { theme } from '../../../theme'
 
 export const Header = () => {
 	const [isSidebarCollapsed, setIsSidebarCollapsed] = useAtom(isSidebarCollapsedAtom)
@@ -29,9 +30,12 @@ export const Header = () => {
 					)}
 				</IconButton>
 
-
 				<Logotype width={200} />
 			</Stack>
+
+			<Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
+				<HeaderTabs />
+			</Box>
 
 			<UserAvatar />
 		</HeaderContainer>

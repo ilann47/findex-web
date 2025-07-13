@@ -9,7 +9,9 @@ interface EnvironmentConfig {
   groups: {
     geral: string;
     authAdmin: string;
-    travels: string;
+    director: string;
+    finance: string;
+    manager: string;
   };
 }
 
@@ -46,7 +48,9 @@ export function getEnvironmentConfig(): EnvironmentConfig {
     groups: {
       geral: import.meta.env.VITE_AZURE_GROUP_GERAL,
       authAdmin: import.meta.env.VITE_AZURE_GROUP_AUTH_ADMIN,
-      travels: import.meta.env.VITE_AZURE_GROUP_TRAVELS,
+      director: import.meta.env.VITE_AZURE_GROUP_DIRECTOR,
+      finance: import.meta.env.VITE_AZURE_GROUP_FINANCE,
+      manager: import.meta.env.VITE_AZURE_GROUP_MANAGER,
     }
   };
   

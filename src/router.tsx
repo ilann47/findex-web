@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
-import { AZURE_GROUPS } from '@/constants/groups';
+import { AZURE_GROUPS } from './constants/groups';
 
 import { NavigationLayout } from './layouts/navigation';
 import { AuthorizedRoute } from './layouts/protected/component';
@@ -9,12 +9,16 @@ import { AuthenticatedRoute } from './layouts/protected/route';
 import ErrorFallbackPage from './pages/error/fallback';
 import ForbiddenPage from './pages/error/forbidden';
 import NotFoundPage from './pages/error/not-found';
-import AuthCallback from "@/pages/auth/callback/AuthCallBack";
+import AuthCallback from "./pages/auth/callback/AuthCallBack";
 
-const LoginPage = lazy(() => import('@/pages/auth/login'));
+const LoginPage = lazy(() => import('./pages/auth/login'));
 const WelcomePage = lazy(() => import('./pages/welcome'));
-const TravelsPage = lazy(() => import('@/pages/travels'));
-const TravelDetailsPage = lazy(() => import('@/pages/travels/details'));
+const TravelsPage = lazy(() => import('./pages/travels'));
+const TravelDetailsPage = lazy(() => import('./pages/travels/details'));
+const ExpensePoliciesPage = lazy(() => import('./pages/expense-policies'));
+const UsersPage = lazy(() => import('./pages/users'));
+const ReportsPage = lazy(() => import('./pages/reports'));
+const SettingsPage = lazy(() => import('./pages/settings'));
 
 const LoadingSpinner = () => <div>Carregando...</div>;
 
@@ -72,6 +76,42 @@ export const router = createBrowserRouter([
                 element: (
                   <Suspense fallback={<LoadingSpinner />}>
                     <TravelDetailsPage />
+                  </Suspense>
+                ),
+              },
+              
+              {
+                path: 'expense-policies',
+                element: (
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <ExpensePoliciesPage />
+                  </Suspense>
+                ),
+              },
+              
+              {
+                path: 'users',
+                element: (
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <UsersPage />
+                  </Suspense>
+                ),
+              },
+              
+              {
+                path: 'reports',
+                element: (
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <ReportsPage />
+                  </Suspense>
+                ),
+              },
+              
+              {
+                path: 'settings',
+                element: (
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <SettingsPage />
                   </Suspense>
                 ),
               },

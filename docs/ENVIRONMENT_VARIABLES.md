@@ -44,7 +44,10 @@ VITE_AZURE_LOGIN_SCOPES=User.Read,openid,profile,email
 VITE_AZURE_GROUP_GERAL=id-do-grupo-geral
 VITE_AZURE_GROUP_AUTH_ADMIN=id-do-grupo-admin
 VITE_AZURE_GROUP_TRAVELS=id-do-grupo-viagens
+VITE_AZURE_GROUP_DIRECTOR=id-do-grupo-diretor
 ```
+
+**⚠️ IMPORTANTE:** O grupo `VITE_AZURE_GROUP_DIRECTOR` é obrigatório para o funcionamento das funcionalidades de administrador.
 
 ## Como Obter os Valores
 

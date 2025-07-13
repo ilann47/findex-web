@@ -1,17 +1,19 @@
 import { Logout } from '@carbon/icons-react'
-import { Avatar, Typography } from '@mui/material'
+import { Avatar, Typography, Chip, Box } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 
-import { Button } from '@/components/ui/inputs/button'
-import { IconButton } from '@/components/ui/inputs/icon-button'
-import { openModal, useModal } from '@/components/ui/modal'
-import { ConfirmationModal } from '@/components/ui/modal/confirmation'
-import Popover, { openPopover, usePopover } from '@/components/ui/popover'
-import { useAuth } from '@/hooks/auth'
-import { getNameInitials } from '@/utils/get-name-initials'
+import { Button } from '../../ui/inputs/button'
+import { IconButton } from '../../ui/inputs/icon-button'
+import { openModal, useModal } from '../../ui/modal'
+import { ConfirmationModal } from '../../ui/modal/confirmation'
+import Popover, { openPopover, usePopover } from '../../ui/popover'
+import { useAuth } from '../../../hooks/auth'
+import { useUserRoles } from '../../../hooks/useUserRoles'
+import { getNameInitials } from '../../../utils/get-name-initials'
 
 export const UserAvatar = () => {
 	const { user, logout } = useAuth()
+	const { getUserRolesSummary, hasDirectorAccess } = useUserRoles()
 
 	const popoverRef = usePopover()
 	const confirmationModalRef = useModal()
@@ -22,6 +24,7 @@ export const UserAvatar = () => {
 
 	const userEmail = user.username || 'Usuário'
 	const displayName = user.name  || userEmail
+	const roleSummary = getUserRolesSummary()
 
 	return (
 		<>
@@ -34,6 +37,16 @@ export const UserAvatar = () => {
 					{displayName}
 				</Typography>
 				<Typography color={(theme) => theme.palette.juicy.neutral[70]}>{userEmail}</Typography>
+				
+				{/* Resumo da Role Principal */}
+				<Box sx={{ mt: 1, mb: 1 }}>
+					<Chip 
+						label={roleSummary}
+						color={hasDirectorAccess ? 'secondary' : 'primary'}
+						size="small"
+						variant="outlined"
+					/>
+				</Box>
 
 				<Button
 					variant='text'
