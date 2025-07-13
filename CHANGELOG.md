@@ -5,9 +5,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
-## [Não Publicado]
 
-## [2.0.0] - 2025-07-12
+## [0.2.0-SNAPSHOT] - 2025-07-12
 
 ### Adicionado
 - Sistema de autenticação MSAL (Microsoft Authentication Library) v2.0
@@ -69,12 +68,11 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 
 ---
 
-## [1.0.0] - 2024-XX-XX
+## [0.1.0] - 2024
 
 ### Adicionado
 - Versão inicial do sistema com autenticação Keycloak
 - Sistema básico de navegação e layouts
-- Integração inicial com APIs SARF
 
 ---
 
