@@ -14,6 +14,7 @@ import AuthCallback from "@/pages/auth/callback/AuthCallBack";
 const LoginPage = lazy(() => import('@/pages/auth/login'));
 const WelcomePage = lazy(() => import('./pages/welcome'));
 const TravelsPage = lazy(() => import('@/pages/travels'));
+const TravelDetailsPage = lazy(() => import('@/pages/travels/details'));
 
 const LoadingSpinner = () => <div>Carregando...</div>;
 
@@ -59,7 +60,20 @@ export const router = createBrowserRouter([
 
               {
                 path: 'travels',
-                element: <TravelsPage />,
+                element: (
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <TravelsPage />
+                  </Suspense>
+                ),
+              },
+              
+              {
+                path: 'travels/:travelId',
+                element: (
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <TravelDetailsPage />
+                  </Suspense>
+                ),
               },
             ],
           },

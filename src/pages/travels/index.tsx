@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import { useNavigate } from 'react-router-dom';
+import {
   Button, 
   TextField, 
   Grid, 
@@ -14,15 +15,17 @@ import {
   TableHead,
   TableRow,
   Chip,
-  Paper
+  Paper,
+  IconButton
 } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
+import { Add as AddIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
 import { TravelDTO, CreateTravelRequest, TravelStatus } from '@/types/travel';
 import { ProtectedComponent } from '@/layouts/protected/component';
 import { ViewLayout } from '@/layouts/view';
 import { travelService } from '@/service/travels';
 
 const TravelsPage: React.FC = () => {
+  const navigate = useNavigate();
   const [travels, setTravels] = useState<TravelDTO[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -152,6 +155,7 @@ const TravelsPage: React.FC = () => {
                   <TableCell>Data Fim</TableCell>
                   <TableCell>Propósito</TableCell>
                   <TableCell>Status</TableCell>
+                  <TableCell>Ações</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -183,6 +187,15 @@ const TravelsPage: React.FC = () => {
                           color={getStatusColor(travel.status)}
                           size="small"
                         />
+                      </TableCell>
+                      <TableCell>
+                        <IconButton
+                          onClick={() => navigate(`/travels/${travel.travelId}`)}
+                          color="primary"
+                          size="small"
+                        >
+                          <VisibilityIcon />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   ))
