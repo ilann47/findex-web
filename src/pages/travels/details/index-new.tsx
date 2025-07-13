@@ -10,6 +10,7 @@ import {
   Button,
   Grid,
   Chip,
+  Divider,
   Alert
 } from '@mui/material';
 import {
@@ -19,6 +20,7 @@ import {
   Receipt as ReceiptIcon,
   DirectionsCar as CarIcon
 } from '@mui/icons-material';
+import { TravelDTO } from '@/types/travel';
 import { ExpenseDTO, AdvanceRequestDTO, MileageReimbursementDTO } from '@/types/expense';
 import { expenseService } from '@/service/expense';
 import { ProtectedComponent } from '@/layouts/protected/component';
@@ -65,16 +67,18 @@ const TravelDetailsPage: React.FC = () => {
     return (
       <ViewLayout.Root>
         <ViewLayout.Content>
-          <Alert severity="error">
-            ID da viagem inválido
-          </Alert>
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={() => navigate('/travels')}
-            sx={{ mt: 2 }}
-          >
-            Voltar para Viagens
-          </Button>
+          <Box sx={{ p: 3 }}>
+            <Alert severity="error">
+              ID da viagem inválido
+            </Alert>
+            <Button
+              startIcon={<ArrowBackIcon />}
+              onClick={() => navigate('/travels')}
+              sx={{ mt: 2 }}
+            >
+              Voltar para Viagens
+            </Button>
+          </Box>
         </ViewLayout.Content>
       </ViewLayout.Root>
     );
@@ -82,13 +86,9 @@ const TravelDetailsPage: React.FC = () => {
 
   return (
     <ProtectedComponent role="TRAVEL_LIST">
-      <ViewLayout.Root>
-        <ViewLayout.Content>
-          <TravelAccessGuard travelId={travelIdNum}>
-            <TravelDetailsContent />
-          </TravelAccessGuard>
-        </ViewLayout.Content>
-      </ViewLayout.Root>
+      <TravelAccessGuard travelId={travelIdNum}>
+        <TravelDetailsContent />
+      </TravelAccessGuard>
     </ProtectedComponent>
   );
 };
@@ -123,9 +123,9 @@ const TravelDetailsContent: React.FC = () => {
     try {
       // Load expense data
       const [expensesData, advancesData, reimbursementsData] = await Promise.all([
-        expenseService.getExpensesByTravelId(travelId),
-        expenseService.getAdvanceRequestsByTravelId(travelId),
-        expenseService.getMileageReimbursementsByTravelId(travelId)
+        expenseService.getExpensesByTravel(travelId),
+        expenseService.getAdvancesByTravel(travelId),
+        expenseService.getReimbursementsByTravel(travelId)
       ]);
 
       setExpenses(expensesData);
@@ -133,9 +133,9 @@ const TravelDetailsContent: React.FC = () => {
       setReimbursements(reimbursementsData);
 
       // Calculate summary
-      const totalExpenses = expensesData.reduce((sum: number, exp: ExpenseDTO) => sum + exp.amount, 0);
-      const totalAdvances = advancesData.reduce((sum: number, adv: AdvanceRequestDTO) => sum + adv.amount, 0);
-      const totalReimbursements = reimbursementsData.reduce((sum: number, reimb: MileageReimbursementDTO) => sum + reimb.totalAmount, 0);
+      const totalExpenses = expensesData.reduce((sum, exp) => sum + exp.amount, 0);
+      const totalAdvances = advancesData.reduce((sum, adv) => sum + adv.amount, 0);
+      const totalReimbursements = reimbursementsData.reduce((sum, reimb) => sum + reimb.amount, 0);
       
       setSummary({
         totalExpenses,
@@ -154,7 +154,7 @@ const TravelDetailsContent: React.FC = () => {
     }
   };
 
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
@@ -197,74 +197,54 @@ const TravelDetailsContent: React.FC = () => {
     }
   };
 
-  const getStatusLabel = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'ativo':
-        return 'Ativa';
-      case 'inativo':
-        return 'Inativa';
-      case 'cancelado':
-        return 'Cancelada';
-      case 'concluido':
-      case 'concluído':
-        return 'Concluída';
-      // Mantém compatibilidade com status antigos
-      case 'pending':
-      case 'pendente':
-        return 'Pendente';
-      case 'approved':
-      case 'aprovado':
-        return 'Aprovada';
-      case 'rejected':
-      case 'rejeitado':
-        return 'Rejeitada';
-      case 'completed':
-        return 'Concluída';
-      default:
-        return status;
-    }
-  };
-
   if (!travel) {
     return (
-      <Alert severity="info">
-        Carregando dados da viagem...
-      </Alert>
+      <ViewLayout.Root>
+        <ViewLayout.Content>
+          <Box sx={{ p: 3 }}>
+            <Alert severity="info">
+              Carregando dados da viagem...
+            </Alert>
+          </Box>
+        </ViewLayout.Content>
+      </ViewLayout.Root>
     );
   }
 
   return (
-    <>
-      {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Button
-          startIcon={<ArrowBackIcon />}
-          onClick={() => navigate('/travels')}
-          sx={{ mb: 2 }}
-        >
-          Voltar para Viagens
-        </Button>
-        
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-          <Typography variant="h4" component="h1">
-            Detalhes da Viagem
-          </Typography>
-          <Chip
-            label={getStatusLabel(travel.status)}
-            color={getStatusColor(travel.status) as any}
-            size="medium"
-            sx={{ 
-              fontWeight: 'bold',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}
-          />
-        </Box>
-        
-        <Typography variant="h5" color="primary" sx={{ fontWeight: 'medium' }}>
-          {travel.origin} → {travel.destination}
-        </Typography>
-      </Box>
+    <ViewLayout.Root>
+      <ViewLayout.Content>
+        <Box sx={{ p: 3 }}>
+          {/* Header */}
+          <Box sx={{ mb: 3 }}>
+            <Button
+              startIcon={<ArrowBackIcon />}
+              onClick={() => navigate('/travels')}
+              sx={{ mb: 2 }}
+            >
+              Voltar para Viagens
+            </Button>
+            
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+              <Typography variant="h4" component="h1">
+                Detalhes da Viagem
+              </Typography>
+              <Chip
+                label={travel.status}
+                color={getStatusColor(travel.status) as any}
+                size="medium"
+                sx={{ 
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}
+              />
+            </Box>
+            
+            <Typography variant="h5" color="primary" sx={{ fontWeight: 'medium' }}>
+              {travel.origin} → {travel.destination}
+            </Typography>
+          </Box>
 
           {/* Travel Info Card */}
           <Card sx={{ mb: 3 }}>
@@ -389,24 +369,26 @@ const TravelDetailsContent: React.FC = () => {
           <CreateExpenseDialog
             open={openExpenseDialog}
             onClose={() => setOpenExpenseDialog(false)}
-            travelId={travel.id!}
+            travelId={travel.id}
             onSuccess={refreshData}
           />
 
           <CreateAdvanceDialog
             open={openAdvanceDialog}
             onClose={() => setOpenAdvanceDialog(false)}
-            travelId={travel.id!}
+            travelId={travel.id}
             onSuccess={refreshData}
           />
 
           <CreateMileageDialog
             open={openMileageDialog}
             onClose={() => setOpenMileageDialog(false)}
-            travelId={travel.id!}
+            travelId={travel.id}
             onSuccess={refreshData}
           />
-        </>
+        </Box>
+      </ViewLayout.Content>
+    </ViewLayout.Root>
   );
 };
 

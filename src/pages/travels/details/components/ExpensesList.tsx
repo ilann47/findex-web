@@ -15,10 +15,12 @@ import { ExpenseDTO, ExpenseType, ExpenseStatus } from '@/types/expense';
 
 interface ExpensesListProps {
   expenses: ExpenseDTO[];
-  onUpdate: () => void;
+  onUpdate?: () => void;
 }
 
-export const ExpensesList: React.FC<ExpensesListProps> = ({ expenses }) => {
+export const ExpensesList: React.FC<ExpensesListProps> = ({ expenses = [] }) => {
+  // Garantir que expenses é sempre um array
+  const safeExpenses = Array.isArray(expenses) ? expenses : [];
   const getExpenseTypeLabel = (type: ExpenseType) => {
     const labels = {
       [ExpenseType.ACCOMMODATION]: 'Hospedagem',
@@ -53,7 +55,7 @@ export const ExpensesList: React.FC<ExpensesListProps> = ({ expenses }) => {
     return new Date(dateString).toLocaleDateString('es-PY');
   };
 
-  if (expenses.length === 0) {
+  if (safeExpenses.length === 0) {
     return (
       <Box sx={{ textAlign: 'center', py: 4 }}>
         <Typography variant="body2" color="text.secondary">
@@ -76,21 +78,29 @@ export const ExpensesList: React.FC<ExpensesListProps> = ({ expenses }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {expenses.map((expense) => (
-            <TableRow key={expense.expenseId}>
-              <TableCell>{getExpenseTypeLabel(expense.type)}</TableCell>
-              <TableCell>{expense.description}</TableCell>
-              <TableCell>{formatCurrency(expense.amount, expense.currency)}</TableCell>
-              <TableCell>{formatDate(expense.date)}</TableCell>
-              <TableCell>
-                <Chip
-                  label={expense.status}
-                  color={getStatusColor(expense.status)}
-                  size="small"
-                />
+          {(!expenses || expenses.length === 0) ? (
+            <TableRow>
+              <TableCell colSpan={6} align="center">
+                Nenhuma despesa encontrada
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            safeExpenses.map((expense) => (
+              <TableRow key={expense.expenseId}>
+                <TableCell>{getExpenseTypeLabel(expense.type)}</TableCell>
+                <TableCell>{expense.description}</TableCell>
+                <TableCell>{formatCurrency(expense.amount, expense.currency)}</TableCell>
+                <TableCell>{formatDate(expense.date)}</TableCell>
+                <TableCell>
+                  <Chip
+                    label={expense.status}
+                    color={getStatusColor(expense.status)}
+                    size="small"
+                  />
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </TableContainer>

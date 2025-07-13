@@ -15,10 +15,10 @@ import { AdvanceRequestDTO, AdvanceRequestStatus } from '@/types/expense';
 
 interface AdvanceRequestsListProps {
   advances: AdvanceRequestDTO[];
-  onUpdate: () => void;
+  onUpdate?: () => void;
 }
 
-export const AdvanceRequestsList: React.FC<AdvanceRequestsListProps> = ({ advances }) => {
+export const AdvanceRequestsList: React.FC<AdvanceRequestsListProps> = ({ advances = [] }) => {
   const getStatusColor = (status: AdvanceRequestStatus) => {
     switch (status) {
       case AdvanceRequestStatus.APPROVED:
@@ -53,7 +53,7 @@ export const AdvanceRequestsList: React.FC<AdvanceRequestsListProps> = ({ advanc
     return new Date(dateString).toLocaleDateString('es-PY');
   };
 
-  if (advances.length === 0) {
+  if (!advances || advances.length === 0) {
     return (
       <Box sx={{ textAlign: 'center', py: 4 }}>
         <Typography variant="body2" color="text.secondary">

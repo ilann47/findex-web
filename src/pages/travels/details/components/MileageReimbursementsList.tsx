@@ -15,10 +15,10 @@ import { MileageReimbursementDTO, ReimbursementStatus } from '@/types/expense';
 
 interface MileageReimbursementsListProps {
   reimbursements: MileageReimbursementDTO[];
-  onUpdate: () => void;
+  onUpdate?: () => void;
 }
 
-export const MileageReimbursementsList: React.FC<MileageReimbursementsListProps> = ({ reimbursements }) => {
+export const MileageReimbursementsList: React.FC<MileageReimbursementsListProps> = ({ reimbursements = [] }) => {
   const getStatusColor = (status: ReimbursementStatus) => {
     switch (status) {
       case ReimbursementStatus.APPROVED:
@@ -53,7 +53,7 @@ export const MileageReimbursementsList: React.FC<MileageReimbursementsListProps>
     return new Date(dateString).toLocaleDateString('es-PY');
   };
 
-  if (reimbursements.length === 0) {
+  if (!reimbursements || reimbursements.length === 0) {
     return (
       <Box sx={{ textAlign: 'center', py: 4 }}>
         <Typography variant="body2" color="text.secondary">
