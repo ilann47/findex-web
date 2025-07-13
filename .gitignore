@@ -26,6 +26,7 @@ docker-compose.yml
 
 # Environment variables
 .env
+.env.example
 .env.local
 .env.development
 .env.homologation
