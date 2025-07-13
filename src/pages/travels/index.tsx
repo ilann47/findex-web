@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Button, 
@@ -16,27 +16,84 @@ import {
   TableRow,
   Chip,
   Paper,
-  IconButton
+  Box,
+  Typography
 } from '@mui/material';
-import { Add as AddIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
+import { Add as AddIcon, Info as InfoIcon } from '@mui/icons-material';
 import { TravelDTO, CreateTravelRequest, TravelStatus } from '@/types/travel';
 import { ProtectedComponent } from '@/layouts/protected/component';
 import { ViewLayout } from '@/layouts/view';
 import { travelService } from '@/service/travels';
+import { TravelFiltersComponent, TravelFilters, defaultFilters } from '@/components/travels/TravelFilters';
+import { filterTravels } from '@/utils/travel-filters';
+import { useAuth } from '@/hooks/useAuth';
+
+// Funções para mapear status antigos para novos
+const mapOldStatusToNew = (status: string): string => {
+  const statusMapping: Record<string, string> = {
+    'APPROVED': 'ATIVO',
+    'PENDING': 'INATIVO', 
+    'CANCELLED': 'CANCELADO',
+    'COMPLETED': 'CONCLUIDO',
+    'REJECTED': 'CANCELADO'
+  };
+  
+  return statusMapping[status] || status;
+};
+
+const getStatusLabel = (status: string): string => {
+  const mappedStatus = mapOldStatusToNew(status);
+  const labels: Record<string, string> = {
+    'ATIVO': 'Ativo',
+    'INATIVO': 'Inativo',
+    'CANCELADO': 'Cancelado',
+    'CONCLUIDO': 'Concluído'
+  };
+  
+  return labels[mappedStatus] || mappedStatus;
+};
+
+const getStatusColor = (status: string): 'success' | 'warning' | 'error' | 'info' => {
+  const mappedStatus = mapOldStatusToNew(status);
+  const colors: Record<string, 'success' | 'warning' | 'error' | 'info'> = {
+    'ATIVO': 'success',
+    'INATIVO': 'warning',
+    'CANCELADO': 'error',
+    'CONCLUIDO': 'info'
+  };
+  
+  return colors[mappedStatus] || 'info';
+};
 
 const TravelsPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [travels, setTravels] = useState<TravelDTO[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [filters, setFilters] = useState<TravelFilters>(defaultFilters);
   const [formData, setFormData] = useState<CreateTravelRequest>({
-    userId: '',
     origin: '',
     destination: '',
     startDate: '',
     endDate: '',
     purpose: ''
   });
+
+  // Filtrar viagens baseado nos filtros ativos
+  const filteredTravels = useMemo(() => {
+    return filterTravels(travels, filters);
+  }, [travels, filters]);
+
+  // Callback para alteração de filtros
+  const handleFiltersChange = (newFilters: TravelFilters) => {
+    setFilters(newFilters);
+  };
+
+  // Callback para limpar filtros
+  const handleClearFilters = () => {
+    setFilters(defaultFilters);
+  };
 
   useEffect(() => {
     loadTravels();
@@ -48,7 +105,13 @@ const TravelsPage: React.FC = () => {
       
       try {
         const travelsData = await travelService.getAllTravels();
-        setTravels(travelsData);
+        const safeTravels = Array.isArray(travelsData) ? travelsData : [];
+        console.log('🔍 Dados das viagens:', safeTravels);
+        if (safeTravels.length > 0) {
+          console.log('📋 Primeira viagem:', safeTravels[0]);
+          console.log('🆔 Travel ID:', safeTravels[0].travelId);
+        }
+        setTravels(safeTravels);
       } catch (error) {
         console.error('❌ Erro ao carregar viagens:', error);
         setTravels([]);
@@ -69,55 +132,70 @@ const TravelsPage: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      const newTravel = await travelService.createTravel(formData);
+      const travelData: CreateTravelRequest = {
+        ...formData,
+        userId: user?.homeAccountId || user?.localAccountId,
+        status: TravelStatus.ATIVO // Status padrão para novas viagens
+      };
+      
+      console.log('📤 Enviando dados da viagem:', travelData);
+      console.log('🔍 Usuário atual:', user);
+      const newTravel = await travelService.createTravel(travelData);
       
       setTravels(prev => [...prev, newTravel]);
       setOpenDialog(false);
       setFormData({
-        userId: '',
         origin: '',
         destination: '',
         startDate: '',
         endDate: '',
         purpose: ''
       });
-    } catch (error) {
+      
+      console.log('✅ Viagem criada com sucesso!', newTravel);
+    } catch (error: any) {
       console.error('❌ Erro ao criar viagem:', error);
-    }
-  };
-
-  const getStatusColor = (status: TravelStatus) => {
-    switch (status) {
-      case TravelStatus.PENDING:
-        return 'warning';
-      case TravelStatus.APPROVED:
-        return 'success';
-      case TravelStatus.REJECTED:
-        return 'error';
-      case TravelStatus.COMPLETED:
-        return 'info';
-      case TravelStatus.CANCELLED:
-        return 'default';
-      default:
-        return 'default';
+      console.error('🔍 Detalhes do erro:', error.response?.data);
+      console.error('📊 Status do erro:', error.response?.status);
     }
   };
 
   const getStatusLabel = (status: TravelStatus) => {
-    switch (status) {
-      case TravelStatus.PENDING:
-        return 'Pendente';
-      case TravelStatus.APPROVED:
-        return 'Aprovada';
-      case TravelStatus.REJECTED:
-        return 'Rejeitada';
-      case TravelStatus.COMPLETED:
-        return 'Concluída';
-      case TravelStatus.CANCELLED:
-        return 'Cancelada';
-      default:
-        return status;
-    }
+    const statusStr = status as string;
+    
+    // Mapeamento de status antigos para novos
+    const statusMapping: Record<string, string> = {
+      'APPROVED': 'Ativa',
+      'PENDING': 'Inativa',
+      'CANCELLED': 'Cancelada', 
+      'COMPLETED': 'Concluída',
+      'REJECTED': 'Cancelada',
+      'ATIVO': 'Ativa',
+      'INATIVO': 'Inativa',
+      'CANCELADO': 'Cancelada',
+      'CONCLUIDO': 'Concluída'
+    };
+    
+    return statusMapping[statusStr] || statusStr;
+  };
+
+  const getStatusColor = (status: TravelStatus) => {
+    const statusStr = status as string;
+    
+    // Mapeia status antigos para cores apropriadas
+    const colorMapping: Record<string, any> = {
+      'APPROVED': 'success',
+      'PENDING': 'warning',
+      'CANCELLED': 'error',
+      'COMPLETED': 'info',
+      'REJECTED': 'error',
+      'ATIVO': 'success',
+      'INATIVO': 'warning',
+      'CANCELADO': 'error',
+      'CONCLUIDO': 'info'
+    };
+    
+    return colorMapping[statusStr] || 'default';
   };
 
   return (
@@ -141,64 +219,93 @@ const TravelsPage: React.FC = () => {
       </ViewLayout.Header.Root>
 
       <ViewLayout.Content>
+        {/* Filtros */}
+        <TravelFiltersComponent
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
+          onClearFilters={handleClearFilters}
+          totalCount={travels.length}
+          filteredCount={filteredTravels.length}
+        />
+
         {/* Travels Table */}
         <Paper>
+          <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', backgroundColor: 'grey.50' }}>
+            <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1, fontSize: '0.875rem' }}>
+              <InfoIcon fontSize="small" />
+              💡 Clique em qualquer linha da tabela para ver os detalhes completos da viagem
+            </Typography>
+          </Box>
           <TableContainer>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Usuário</TableCell>
                   <TableCell>Origem</TableCell>
                   <TableCell>Destino</TableCell>
                   <TableCell>Data Início</TableCell>
                   <TableCell>Data Fim</TableCell>
                   <TableCell>Propósito</TableCell>
                   <TableCell>Status</TableCell>
-                  <TableCell>Ações</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={8} align="center">
+                    <TableCell colSpan={6} align="center">
                       Carregando viagens...
                     </TableCell>
                   </TableRow>
-                ) : travels.length === 0 ? (
+                ) : filteredTravels.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} align="center">
-                      Nenhuma viagem encontrada. Clique em "Nova Viagem" para começar.
+                    <TableCell colSpan={6} align="center">
+                      {travels.length === 0 
+                        ? "Nenhuma viagem encontrada. Clique em 'Nova Viagem' para começar."
+                        : "Nenhuma viagem corresponde aos filtros aplicados."
+                      }
                     </TableCell>
                   </TableRow>
                 ) : (
-                  travels.map((travel) => (
-                    <TableRow key={travel.travelId}>
-                      <TableCell>{travel.travelId}</TableCell>
-                      <TableCell>{travel.userId}</TableCell>
-                      <TableCell>{travel.origin}</TableCell>
-                      <TableCell>{travel.destination}</TableCell>
-                      <TableCell>{new Date(travel.startDate).toLocaleDateString()}</TableCell>
-                      <TableCell>{new Date(travel.endDate).toLocaleDateString()}</TableCell>
-                      <TableCell>{travel.purpose}</TableCell>
-                      <TableCell>
-                        <Chip
-                          label={getStatusLabel(travel.status)}
-                          color={getStatusColor(travel.status)}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <IconButton
-                          onClick={() => navigate(`/travels/${travel.travelId}`)}
-                          color="primary"
-                          size="small"
-                        >
-                          <VisibilityIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  (Array.isArray(filteredTravels) ? filteredTravels : []).map((travel, index) => {
+                    const handleTravelClick = () => {
+                      // Tenta usar travelId, depois id, depois índice como fallback
+                      const id = travel.travelId || travel.id || index + 1;
+                      console.log('🔗 Navegando para viagem com ID:', id);
+                      console.log('🔍 Dados da viagem:', travel);
+                      navigate(`/travels/${id}`);
+                    };
+
+                    return (
+                      <TableRow 
+                        key={travel.travelId || travel.id || `travel-${index}`}
+                        onClick={handleTravelClick}
+                        sx={{ 
+                          cursor: 'pointer',
+                          '&:hover': {
+                            backgroundColor: 'action.hover',
+                            transform: 'scale(1.01)',
+                            boxShadow: 1,
+                          },
+                          transition: 'all 0.2s ease-in-out',
+                          '&:active': {
+                            transform: 'scale(0.99)',
+                          }
+                        }}
+                      >
+                        <TableCell>{travel.origin}</TableCell>
+                        <TableCell>{travel.destination}</TableCell>
+                        <TableCell>{new Date(travel.startDate).toLocaleDateString()}</TableCell>
+                        <TableCell>{new Date(travel.endDate).toLocaleDateString()}</TableCell>
+                        <TableCell>{travel.purpose}</TableCell>
+                        <TableCell>
+                          <Chip
+                            label={getStatusLabel(travel.status)}
+                            color={getStatusColor(travel.status)}
+                            size="small"
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>
@@ -210,16 +317,6 @@ const TravelsPage: React.FC = () => {
           <DialogTitle>Nova Viagem</DialogTitle>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="ID do Usuário"
-                  value={formData.userId}
-                  onChange={handleInputChange('userId')}
-                  required
-                />
-              </Grid>
-              
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
@@ -285,7 +382,7 @@ const TravelsPage: React.FC = () => {
             <Button 
               onClick={handleSubmit} 
               variant="contained"
-              disabled={!formData.userId || !formData.origin || !formData.destination || !formData.startDate || !formData.endDate || !formData.purpose}
+              disabled={!formData.origin || !formData.destination || !formData.startDate || !formData.endDate || !formData.purpose}
             >
               Criar Viagem
             </Button>
