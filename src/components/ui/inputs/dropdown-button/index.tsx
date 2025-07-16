@@ -24,9 +24,9 @@ interface DropdownButtonProps extends Omit<ButtonProps, 'size' | 'title'> {
 const DropdownButton = ({ options, title, size = 'medium', ...other }: DropdownButtonProps) => {
 	const popoverRef = usePopover()
 	const formatMessage = useFormatMessage()
-	const { userHasRole } = useAuth()
+	const { userHasGroup } = useAuth()
 
-	if (options.length === 0 || !options.some((opt) => (opt.role ? userHasRole(opt.role) : true))) return null
+	if (options.length === 0 || !options.some((opt) => (opt.role ? userHasGroup(opt.role) : true))) return null
 
 	return (
 		<>
@@ -47,7 +47,7 @@ const DropdownButton = ({ options, title, size = 'medium', ...other }: DropdownB
 				<MenuList>
 					{options?.map(
 						(option) =>
-							(option.role ? userHasRole(option.role) : true) && (
+							(option.role ? userHasGroup(option.role) : true) && (
 								<MenuItem onClick={option.onClick} key={option.label.toString()} sx={{ minWidth: 120 }}>
 									{formatMessage(option.label)}
 								</MenuItem>

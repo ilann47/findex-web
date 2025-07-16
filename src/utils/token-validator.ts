@@ -87,7 +87,7 @@ export function logTokenValidation(token: string) {
   
   Object.entries(validation.claims).forEach(([key, value]) => {
     if (value !== undefined) {
-      console.log(`${key}:`, value);
+      
     }
   });
   console.groupEnd();

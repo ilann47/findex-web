@@ -26,7 +26,7 @@ import { ViewLayout } from '@/layouts/view';
 import { travelService } from '@/service/travels';
 import { TravelFiltersComponent, TravelFilters, defaultFilters } from '@/components/travels/TravelFilters';
 import { filterTravels } from '@/utils/travel-filters';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/auth';
 
 // Funções para mapear status antigos para novos
 const mapOldStatusToNew = (status: string): string => {
@@ -106,10 +106,10 @@ const TravelsPage: React.FC = () => {
       try {
         const travelsData = await travelService.getAllTravels();
         const safeTravels = Array.isArray(travelsData) ? travelsData : [];
-        console.log('🔍 Dados das viagens:', safeTravels);
+        
         if (safeTravels.length > 0) {
-          console.log('📋 Primeira viagem:', safeTravels[0]);
-          console.log('🆔 Travel ID:', safeTravels[0].travelId);
+          
+          
         }
         setTravels(safeTravels);
       } catch (error) {
@@ -134,12 +134,12 @@ const TravelsPage: React.FC = () => {
     try {
       const travelData: CreateTravelRequest = {
         ...formData,
-        userId: user?.homeAccountId || user?.localAccountId,
+        userId: user?.homeAccountId || user?.id,
         status: TravelStatus.ATIVO // Status padrão para novas viagens
       };
       
-      console.log('📤 Enviando dados da viagem:', travelData);
-      console.log('🔍 Usuário atual:', user);
+      
+      
       const newTravel = await travelService.createTravel(travelData);
       
       setTravels(prev => [...prev, newTravel]);
@@ -152,7 +152,7 @@ const TravelsPage: React.FC = () => {
         purpose: ''
       });
       
-      console.log('✅ Viagem criada com sucesso!', newTravel);
+      
     } catch (error: any) {
       console.error('❌ Erro ao criar viagem:', error);
       console.error('🔍 Detalhes do erro:', error.response?.data);
@@ -269,8 +269,8 @@ const TravelsPage: React.FC = () => {
                     const handleTravelClick = () => {
                       // Tenta usar travelId, depois id, depois índice como fallback
                       const id = travel.travelId || travel.id || index + 1;
-                      console.log('🔗 Navegando para viagem com ID:', id);
-                      console.log('🔍 Dados da viagem:', travel);
+                      
+                      
                       navigate(`/travels/${id}`);
                     };
 

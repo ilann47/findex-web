@@ -50,9 +50,9 @@ class TravelService {
 
   async createTravel(travelData: CreateTravelRequest): Promise<TravelDTO> {
     try {
-      console.log('🔄 Tentando criar viagem via API...', travelData);
+      
       const response = await gedvAPI.post('/travels', travelData);
-      console.log('✅ Resposta da API:', response.data);
+      
       return response.data;
     } catch (error: any) {
       console.error('❌ Erro detalhado ao criar viagem:', {

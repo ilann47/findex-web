@@ -124,14 +124,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Integração com Azure Active Directory para autenticação e autorização
 - Sistema de gerenciamento de grupos do Azure AD
 - Página de callback para autenticação MSAL
-- Sistema completo de gerenciamento de viagens (PayTravel)
+- Sistema completo de gerenciamento de viagens (SIPROV)
 - Componente de mapa interativo com marcadores para visualização de viagens
 - Schemas de validação para viagens, localizações e calibrações
 - Sistema de alarmes com tipagem TypeScript
 - Hooks personalizados para integração com APIs GEDV
 - Utilitários para validação e decodificação de tokens JWT
 - Suporte a múltiplas estratégias de token
-- Branding completo do PayTravel com novos logos e ícones
+- Branding completo do SIPROV com novos logos e ícones
 - Documentação completa do projeto
 - Documentação das variáveis de ambiente
 - Scripts para criação de roles no Azure AD

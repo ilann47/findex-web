@@ -4,7 +4,7 @@ import { ViewLayout } from '@/layouts/view';
 import { Typography, Box } from '@mui/material';
 
 const ExpensePoliciesTestPage: React.FC = () => {
-  console.log('📄 ExpensePoliciesTestPage: Página de teste carregada');
+  
 
   return (
     <DirectorGuard>

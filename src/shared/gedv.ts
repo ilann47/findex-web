@@ -8,12 +8,6 @@ export const gedvAPI = axios.create({
 	baseURL: import.meta.env.VITE_GEDV_API_URL,
 });
 
-// Log da configuração para debug
-console.log('🔧 Configuração da API GEDV:', {
-	baseURL: import.meta.env.VITE_GEDV_API_URL,
-	env: import.meta.env.MODE
-});
-
 gedvAPI.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
         const account = msalInstance.getActiveAccount();
@@ -35,7 +29,7 @@ gedvAPI.interceptors.request.use(
                 
                 config.headers.Authorization = `Bearer ${response.accessToken}`;
             } else {
-                console.warn('⚠️ Nenhum token obtido na resposta');
+                // Nenhum token obtido na resposta
             }
 
         } catch (error) {
@@ -66,7 +60,7 @@ gedvAPIWithCustomToken.interceptors.request.use(
         const account = msalInstance.getActiveAccount();
 
         if (!account) {
-            console.warn("Nenhuma conta ativa encontrada. Requisição para a API seguirá sem token.");
+            // Nenhuma conta ativa encontrada
             return config;
         }
 

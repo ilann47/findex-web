@@ -39,7 +39,7 @@ import { CreateExpensePolicyRequest } from '../../types/expense-policy';
 import { useExpensePolicies } from '../../hooks/useExpensePolicies';
 
 const ExpensePoliciesPage: React.FC = () => {
-  console.log('📋 ExpensePoliciesPage renderizada');
+  
   
   const {
     policies,
@@ -56,13 +56,7 @@ const ExpensePoliciesPage: React.FC = () => {
     clearError
   } = useExpensePolicies();
 
-  console.log('📊 Dados do hook:', { 
-    policiesCount: policies.length, 
-    loading, 
-    error,
-    hasCategories: categories.length,
-    hasPaymentMethods: paymentMethods.length
-  });
+  
 
   const [openDialog, setOpenDialog] = useState(false);
   const [editingPolicy, setEditingPolicy] = useState<number | null>(null);
@@ -134,13 +128,13 @@ const ExpensePoliciesPage: React.FC = () => {
         const result = await updatePolicy(editingPolicy, formData);
         if (result) {
           handleCloseDialog();
-          console.log('✅ Política atualizada com sucesso');
+          
         }
       } else {
         const result = await createPolicy(formData);
         if (result) {
           handleCloseDialog();
-          console.log('✅ Política criada com sucesso');
+          
         }
       }
     } catch (error) {
@@ -152,7 +146,7 @@ const ExpensePoliciesPage: React.FC = () => {
     if (window.confirm('Tem certeza que deseja excluir esta política?')) {
       const success = await deletePolicy(id);
       if (success) {
-        console.log('✅ Política excluída com sucesso');
+        
       }
     }
   };
@@ -160,7 +154,7 @@ const ExpensePoliciesPage: React.FC = () => {
   const handleToggleStatus = async (id: number, isActive: boolean) => {
     const success = await togglePolicyStatus(id, !isActive);
     if (success) {
-      console.log(`✅ Política ${!isActive ? 'ativada' : 'desativada'} com sucesso`);
+      
     }
   };
 
@@ -169,7 +163,7 @@ const ExpensePoliciesPage: React.FC = () => {
     if (newName && newName.trim()) {
       const cloned = await clonePolicy(id, newName.trim());
       if (cloned) {
-        console.log('✅ Política clonada com sucesso');
+        
       }
     }
   };

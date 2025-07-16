@@ -1,4 +1,4 @@
-// Arquivo: src/App.tsx (VERSÃO CORRIGIDA E SIMPLIFICADA)
+// Arquivo: src/App.tsx (VERSÃO HÍBRIDA COM SUPORTE AZURE E GOOGLE)
 
 import { CssBaseline } from '@mui/material';
 import { flatten } from 'flat';
@@ -30,7 +30,7 @@ function App() {
 
       <ToastContainer autoClose={5000} position='bottom-left' />
 
-      {/* A responsabilidade principal do App agora é renderizar o roteador. */}
+      {/* O roteador agora sempre está disponível - a proteção será feita nas rotas */}
       <RouterProvider router={router} />
     </IntlProvider>
   );

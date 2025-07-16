@@ -8,18 +8,18 @@ import './config/environment';
 
 import App from './App.tsx';
 import { theme } from './theme/index.ts';
-import { AzureAuthProvider } from './provider/auth.tsx'; 
+import { HybridAuthProvider } from './provider/hybrid-auth.tsx'; 
 
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.querySelector('#root')!).render(
   <ThemeProvider theme={theme}>
     <React.StrictMode>
-      <AzureAuthProvider>
+      <HybridAuthProvider>
         <QueryClientProvider client={queryClient}>
           <App />
         </QueryClientProvider>
-      </AzureAuthProvider>
+      </HybridAuthProvider>
     </React.StrictMode>
   </ThemeProvider>
 );

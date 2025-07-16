@@ -3,9 +3,10 @@ import { loginRequest } from "@/authConfig";
 import { ROLE_GROUP_MAPPING } from "@/constants/groups";
 
 /**
- * Hook personalizado para encapsular a lógica de autenticação e autorização.
+ * Hook personalizado para encapsular a lógica de autenticação e autorização AZURE AD.
+ * @deprecated Use useAuth do sistema híbrido para nova funcionalidade
  */
-export const useAuth = () => {
+export const useAzureAuth = () => {
     const { instance, accounts } = useMsal();
     const user = accounts[0];
 
@@ -97,19 +98,19 @@ export const useAuth = () => {
      * Funções placeholder para funcionalidades que ainda não foram implementadas
      */
     const verifyEmail = async () => {
-        console.warn("⚠️ verifyEmail não implementado ainda");
+        // verifyEmail não implementado ainda
     };
 
     const validateEmail = async () => {
-        console.warn("⚠️ validateEmail não implementado ainda");
+        // validateEmail não implementado ainda
     };
 
     const resetPassword = async () => {
-        console.warn("⚠️ resetPassword não implementado ainda");
+        // resetPassword não implementado ainda
     };
 
     const register = async () => {
-        console.warn("⚠️ register não implementado ainda");
+        // register não implementado ainda
     };
 
     const email = user?.username || "";

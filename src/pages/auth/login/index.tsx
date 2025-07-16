@@ -1,12 +1,12 @@
 import { Button, Stack, Typography, Box, Paper } from '@mui/material';
-import { useAuth } from '@/hooks/auth';
+import { useAuth } from '../../../provider/hybrid-auth';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const GEDV_LOGO_PATH = '/src/assets/images/payTravel_logotype.svg';
+const GEDV_LOGO_PATH = '/src/assets/images/siprov_logotype.svg';
 
 const LoginPage = () => {
-  const { login, isAuthenticated } = useAuth();
+  const { loginWithAzure, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,7 +16,7 @@ const LoginPage = () => {
   }, [isAuthenticated, navigate]);
 
   const handleLogin = () => {
-    login();
+    loginWithAzure();
   };
 
   return (
@@ -51,7 +51,7 @@ const LoginPage = () => {
           fontWeight='medium'
           sx={{ mb: 1 }}
         >
-          Bem-vindo ao payTravel
+          Bem-vindo ao SIPROV
         </Typography>
 
         <Typography
@@ -88,7 +88,7 @@ const LoginPage = () => {
         sx={{ mt: 4, opacity: 0.6 }}
         align='center'
       >
-        © {new Date().getFullYear()} payTravel
+        © {new Date().getFullYear()} SIPROV
       </Typography>
     </Stack>
   );

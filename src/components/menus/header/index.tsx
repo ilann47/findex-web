@@ -6,7 +6,7 @@ import { useAtom } from 'jotai'
 
 import { HeaderContainer } from './style'
 import { HeaderTabs } from './tabs'
-import Logotype from '../../../assets/images/payTravel_logotype.svg?react'
+import Logotype from '../../../assets/images/siprov_logotype.svg?react'
 import { IconButton } from '../../ui/inputs/icon-button'
 import { UserAvatar } from '../../user/avatar'
 import { isSidebarCollapsedAtom } from '../../../contexts/atoms/sidebar'

@@ -9,14 +9,14 @@ export const HeaderTabs = () => {
   const [isAdminMode, setIsAdminMode] = useAtom(isAdminModeAtom);
   const { hasDirectorAccess } = useDirectorAccess();
 
-  // Se o usuário perde acesso de diretor, resetar para modo usuário
+  // Se o usuário perde acesso de admin, resetar para modo usuário
   useEffect(() => {
     if (!hasDirectorAccess && isAdminMode) {
       setIsAdminMode(false);
     }
   }, [hasDirectorAccess, isAdminMode, setIsAdminMode]);
 
-  // Se o usuário não tem acesso de diretor, não mostrar as tabs
+  // Se o usuário não tem acesso de admin, não mostrar as tabs usuário/administrador
   if (!hasDirectorAccess) {
     return null;
   }

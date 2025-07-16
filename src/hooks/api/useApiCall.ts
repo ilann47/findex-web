@@ -26,7 +26,7 @@ export const useApiCall = (options: UseApiCallOptions = {}) => {
     setState(prev => ({ ...prev, loading: true, error: null, data: null }));
 
     try {
-      console.log(`🔄 Fazendo requisição ${method} para: ${endpoint}`);
+      
       
       let response;
       
@@ -47,7 +47,7 @@ export const useApiCall = (options: UseApiCallOptions = {}) => {
           throw new Error(`Método HTTP não suportado: ${method}`);
       }
 
-      console.log(`✅ Resposta da API:`, response.data);
+      
       
       setState(prev => ({ 
         ...prev, 

@@ -1,21 +1,23 @@
 import { Configuration, PublicClientApplication } from "@azure/msal-browser";
+import { ENV_CONFIG } from "./config/environment";
 
+// Configuração Azure AD (mantém a existente)
 export const msalConfig: Configuration = {
   auth: {
-	clientId: import.meta.env.VITE_AZURE_CLIENT_ID,
-	authority: `https://login.microsoftonline.com/${import.meta.env.VITE_AZURE_TENANT_ID}`,
-	redirectUri: import.meta.env.VITE_REDIRECT_URI || window.location.origin + "/auth/callback",
-	postLogoutRedirectUri: import.meta.env.VITE_POST_LOGOUT_REDIRECT_URI || window.location.origin + "/login",
-	knownAuthorities: [`${import.meta.env.VITE_AZURE_TENANT_ID}.b2clogin.com`, `login.microsoftonline.com`],
+    clientId: ENV_CONFIG.azureClientId,
+    authority: `https://login.microsoftonline.com/${ENV_CONFIG.azureTenantId}`,
+    redirectUri: ENV_CONFIG.redirectUri || window.location.origin + "/auth/callback",
+    postLogoutRedirectUri: ENV_CONFIG.postLogoutRedirectUri || window.location.origin + "/login",
+    knownAuthorities: [`${ENV_CONFIG.azureTenantId}.b2clogin.com`, `login.microsoftonline.com`],
   },
   cache: {
-	cacheLocation: "localStorage",
-	storeAuthStateInCookie: false,
+    cacheLocation: "localStorage",
+    storeAuthStateInCookie: false,
   },
 };
 
 export const loginRequest = {
-  scopes: import.meta.env.VITE_AZURE_LOGIN_SCOPES?.split(',') || ["User.Read"],
+  scopes: ENV_CONFIG.azureLoginScopes,
   extraQueryParameters: {
     claims: JSON.stringify({
       "access_token": {
@@ -27,9 +29,9 @@ export const loginRequest = {
 
 export const apiRequest = {
   scopes: [
-    `${import.meta.env.VITE_AZURE_CLIENT_ID}/.default`
+    `${ENV_CONFIG.azureClientId}/.default`
   ],
-  authority: `https://login.microsoftonline.com/${import.meta.env.VITE_AZURE_TENANT_ID}`,
+  authority: `https://login.microsoftonline.com/${ENV_CONFIG.azureTenantId}`,
   extraQueryParameters: {
     claims: JSON.stringify({
       "access_token": {
@@ -41,9 +43,9 @@ export const apiRequest = {
 
 export const apiRequestDirect = {
   scopes: [
-    import.meta.env.VITE_AZURE_CLIENT_ID
+    ENV_CONFIG.azureClientId
   ],
-  authority: `https://login.microsoftonline.com/${import.meta.env.VITE_AZURE_TENANT_ID}`,
+  authority: `https://login.microsoftonline.com/${ENV_CONFIG.azureTenantId}`,
   extraQueryParameters: {
     claims: JSON.stringify({
       "access_token": {
@@ -51,11 +53,38 @@ export const apiRequestDirect = {
       }
     })
   }
+};
+
+// Instância MSAL (só criada se Azure estiver habilitado)
+export const msalInstance = ENV_CONFIG.enabledProviders.includes('azure') 
+  ? new PublicClientApplication(msalConfig)
+  : null;
+
+// Configuração Google OAuth
+export const googleConfig = {
+  clientId: ENV_CONFIG.googleClientId,
+  scope: 'openid email profile',
+  redirectUri: ENV_CONFIG.redirectUri || window.location.origin + "/auth/callback",
+  postLogoutRedirectUri: ENV_CONFIG.postLogoutRedirectUri || window.location.origin + "/login",
+};
+
+// Configuração unificada
+export const authConfig = {
+  enabledProviders: ENV_CONFIG.enabledProviders,
+  defaultProvider: ENV_CONFIG.defaultProvider,
+  azure: ENV_CONFIG.enabledProviders.includes('azure') ? {
+    msalConfig,
+    loginRequest,
+    apiRequest,
+    apiRequestDirect,
+    instance: msalInstance
+  } : null,
+  google: ENV_CONFIG.enabledProviders.includes('google') ? googleConfig : null,
 };
 
 export const apiTokenRequest = {
   scopes: [
-    `${import.meta.env.VITE_AZURE_CLIENT_ID}/.default`
+    `${ENV_CONFIG.azureClientId}/.default`
   ],
   extraQueryParameters: {
     claims: JSON.stringify({
@@ -65,5 +94,3 @@ export const apiTokenRequest = {
     })
   }
 };
-
-export const msalInstance = new PublicClientApplication(msalConfig);
