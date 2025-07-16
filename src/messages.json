@@ -1,0 +1,104 @@
+{
+	"pt": {
+		"welcome": {
+			"title": "Bem-vindo ao SIPROV",
+			"description": "SIPROV é uma plataforma de gestão de viagens e despesas, facilitando o planejamento e controle de gastos durante viagens corporativas.",
+			"role-warning": "Aviso sobre funções do usuário"
+		},
+		"message": {
+			"offline": {
+				"title": "Você está offline",
+				"description": "Verifique sua conexão com a internet para continuar usando o sistema."
+			},
+			"forbidden": {
+				"title": "Acesso Negado",
+				"description": "Você não tem permissão para acessar esta página."
+			}
+		},
+		"travels": {
+			"title": "Viagens",
+			"create": "Nova Viagem",
+			"origin": "Origem",
+			"destination": "Destino",
+			"startDate": "Data de Início",
+			"endDate": "Data de Fim",
+			"purpose": "Propósito",
+			"status": "Status"
+		},
+		"portuguese": "Português",
+		"spanish": "Espanhol",
+		"collapse-sidebar": "Recolher menu lateral",
+		"auth": {
+			"exit": "Sair",
+			"exit-confirmation": {
+				"title": "Confirmar Saída",
+				"description": "Tem certeza de que deseja sair do sistema?"
+			},
+			"user": {
+				"title": {
+					"singular": "Usuário"
+				}
+			}
+		},
+		"form": {
+			"cancel": "Cancelar",
+			"confirm": "Confirmar",
+			"step": {
+				"back": "Voltar"
+			}
+		},
+		"version": "Versão",
+		"v": "v{version}"
+	},
+	"es": {
+		"welcome": {
+			"title": "Bienvenido al SIPROV",
+			"description": "SIPROV es una plataforma de gestión de viajes y gastos, facilitando la planificación y control de gastos durante viajes corporativos.",
+			"role-warning": "Advertencia sobre roles de usuario"
+		},
+		"message": {
+			"offline": {
+				"title": "Estás desconectado",
+				"description": "Verifica tu conexión a internet para continuar usando el sistema."
+			},
+			"forbidden": {
+				"title": "Acceso Denegado",
+				"description": "No tienes permiso para acceder a esta página."
+			}
+		},
+		"travels": {
+			"title": "Viajes",
+			"create": "Nuevo Viaje",
+			"origin": "Origen",
+			"destination": "Destino",
+			"startDate": "Fecha de Inicio",
+			"endDate": "Fecha de Fin",
+			"purpose": "Propósito",
+			"status": "Estado"
+		},
+		"portuguese": "Portugués",
+		"spanish": "Español",
+		"collapse-sidebar": "Contraer menú lateral",
+		"auth": {
+			"exit": "Salir",
+			"exit-confirmation": {
+				"title": "Confirmar Salida",
+				"description": "¿Está seguro de que desea salir del sistema?"
+			},
+			"user": {
+				"title": {
+					"singular": "Usuario"
+				}
+			}
+		},
+		"form": {
+			"cancel": "Cancelar",
+			"confirm": "Confirmar",
+			"step": {
+				"back": "Volver"
+			}
+		},
+		"version": "Versión",
+		"v": "v{version}"
+	}
+}
